@@ -11,7 +11,10 @@
 #include "framebuffer.h"
 #include "ShaderProgram.h"
 
-int test::MyTest()
+#include "mesh.h"
+#include <glm/gtc/type_ptr.hpp>
+
+int Test::MyTest()
 {
 	std::cout << "Hello from test class" << std::endl;
 
@@ -21,9 +24,9 @@ int test::MyTest()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+   
 
-
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(Width, Height, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -31,36 +34,106 @@ int test::MyTest()
         return -1;
     }
     glfwMakeContextCurrent(window);
-
+	glfwSetWindowUserPointer(window, this);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
+	//glEnable(GL_DEPTH_TEST);
 
-    int Width = 800;
-	int Height = 600;
+    camera = new Camera();
+
     glViewport(0, 0, Width, Height);
 
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-
-    float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-    };
-
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	Mesh* TriangleMesh = new Mesh();
+	std::vector<Vertex> vertices;
     
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f))); // Bottom-right
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 0.0f))); // Top-left
+
+    // Back face (2 triangles)
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 1.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 1.0f))); // Bottom-right
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.5f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 1.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.5f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.5f, 1.0f, 0.5f))); // Top-left
+
+    // Left face (2 triangles)
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 1.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(1.0f, 0.5f, 0.5f))); // Bottom-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 1.0f, 0.0f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 1.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 1.0f, 0.0f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.5f))); // Top-left
+
+    // Right face (2 triangles)
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.5f, 0.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.5f, 1.0f))); // Bottom-right
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.5f, 0.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.5f, 0.0f, 1.0f))); // Top-left
+
+    // Top face (2 triangles)
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(1.0f, 1.0f, 1.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f))); // Bottom-right
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.0f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(1.0f, 1.0f, 1.0f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.0f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.5f, 0.5f))); // Top-left
+
+    // Bottom face (2 triangles)
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.5f, 0.5f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f))); // Bottom-right
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.5f, 0.5f))); // Bottom-left
+    vertices.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f))); // Top-right
+    vertices.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 0.0f))); // Top-left
+
+
+
+    TriangleMesh->vertices = vertices;
+  
+
+    TriangleMesh->Bind();
+
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+        auto app = reinterpret_cast<Test*>(glfwGetWindowUserPointer(window));
+        if (app)
+        {
+            app->WindowFramebufferSizeCallback(width, height);
+        }
+        });
+
+    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+        auto app = reinterpret_cast<Test*>(glfwGetWindowUserPointer(window));
+        if (app) app->MouseMoveCallback(window, xpos, ypos);
+        });
+
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
+        auto app = reinterpret_cast<Test*>(glfwGetWindowUserPointer(window));
+        if (app) app->MouseButtonCallback(window, button, action, mods);
+        });
+
+    glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
+        auto app = reinterpret_cast<Test*>(glfwGetWindowUserPointer(window));
+        if (app) app->MouseScrollCallback(window, xoffset, yoffset);
+        });
+
+    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        auto app = reinterpret_cast<Test*>(glfwGetWindowUserPointer(window));
+        if (app) app->KeyCallback(window, key, scancode, action, mods);
+        });
+
+
+
 
 
     // Imgui
@@ -78,54 +151,85 @@ int test::MyTest()
 
     // Imgui
 
-
-
-    FrameBuffer sceneBuffer(800, 600);
+    framebuffer = new FrameBuffer(Width, Height);
 
    
     ShaderProgram* shaderProgram = new ShaderProgram();
-	shaderProgram->ReadShaderFile("core/shaders/VertexShader.vert", "core/shaders/FragmentShader.frag");
+	shaderProgram->ReadShaderFile("D:/OpenGL/MyEngine/MyOpenGLEngine/core/shaders/VertexShader.vert", "D:/OpenGL/MyEngine/MyOpenGLEngine/core/shaders/FragmentShader.frag");
 	shaderProgram->CompileShaders();
+    shaderProgram->CreateProgram();
+    //TriangleMesh->transform.AddLocation(glm::vec3(0.0f, 0.0f, -3.f));
+    float RotSpeedX = 0;
+    float RotSpeedY = 0;
+    float RotSpeedZ = 0;
+
+    glEnable(GL_DEPTH_TEST);
+
+    
+
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        ProcessInput(window);
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        sceneBuffer.Bind();
+        framebuffer->Bind();
+
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         bool yes = true;
         OpenDockSpace(&yes);
 
-        ImGui::Begin("Window");
-		ImGui::Text("Hello, world!");
+        
+        //ImGui::ShowDemoWindow(); // Show demo window! :)
+
+
+		ImGui::Begin("Properties");
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+		ImGui::SliderFloat("Rotation Speed X", &RotSpeedX, -180.0f, 180.0f);
+		ImGui::SliderFloat("Rotation Speed Y", &RotSpeedY, -180.0f, 180.0f);
+		ImGui::SliderFloat("Rotation Speed Z", &RotSpeedZ, -180.0f, 180.0f);
+
+		ImGui::Value("XRotation", TriangleMesh->transform.GetRotation().x);
+		ImGui::Value("YRotation", TriangleMesh->transform.GetRotation().y);
+		ImGui::Value("ZRotation", TriangleMesh->transform.GetRotation().z);
+
+        if (ImGui::Button("Reset Rotation")) {
+			TriangleMesh->transform.SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+            RotSpeedX = 0;
+			RotSpeedY = 0;
+			RotSpeedZ = 0;
+        }
+
+
 		ImGui::End();
 
-        
-        ImGui::ShowDemoWindow(); // Show demo window! :)
+        TriangleMesh->transform.AddRotation(glm::vec3(RotSpeedX * deltaTime, RotSpeedY * deltaTime, RotSpeedZ * deltaTime));
+
 
 
         shaderProgram->UseProgram();
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        // 1. then set the vertex attributes pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-        glBindVertexArray(VAO);
-        // 2. copy our vertices array in a buffer for OpenGL to use
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        // 3. then set our vertex attributes pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-      
-   
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(TriangleMesh->transform.GetMatrix()));
+        //TriangleMesh->Draw();
+        
+
+		float Aspect = (float)Width / (float)Height;
+        glm::mat4 projection = glm::perspective(glm::radians(90.f), Aspect, 0.1f, 100.0f);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
+
 
         glfwPollEvents();
 
-   
+
 
         ImGui::Begin("Scene");
         {
@@ -137,7 +241,7 @@ int test::MyTest()
             Width = width;
             Height = height;
             ImGui::Image(
-                (ImTextureID)sceneBuffer.getFrameTexture(),
+                (ImTextureID)framebuffer->getFrameTexture(),
                 ImGui::GetContentRegionAvail(),
                 ImVec2(0, 1),
                 ImVec2(1, 0)
@@ -147,18 +251,32 @@ int test::MyTest()
         }
         ImGui::EndChild();
         ImGui::End();
+       
 
-		
+        ImGui::Begin("Camera");
+		ImGui::Value("Pos X", camera->cameraPos.x);
+		ImGui::Value("Pos Y", camera->cameraPos.y);
+		ImGui::Value("Pos Z", camera->cameraPos.z);
+		ImGui::Value("Speed", camera->CameraSpeed);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        //glClear(GL_COLOR_BUFFER_BIT);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        sceneBuffer.Unbind();
+        ImGui::End();
+
+
+
+        framebuffer->Unbind();
+
         glfwSwapBuffers(window);
 
 
-        ImGui::Render();
 
+
+
+
+        //glClear(GL_COLOR_BUFFER_BIT);
+       
+
+
+        ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 
@@ -167,10 +285,13 @@ int test::MyTest()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    delete TriangleMesh;
+    delete camera;
+
     glfwTerminate();
 }
 
-void test::OpenDockSpace(bool* p_open)
+void Test::OpenDockSpace(bool* p_open)
 {
     // Variables to configure the Dockspace example.
     static bool opt_fullscreen = true; // Is the Dockspace full-screen?
@@ -287,4 +408,45 @@ void test::OpenDockSpace(bool* p_open)
 
     // End the parent window that contains the Dockspace:
     ImGui::End();
+}
+
+void Test::WindowFramebufferSizeCallback(int width, int height)
+{
+	glViewport(0, 0, width, height);
+    Width = width;
+	Height = height;
+	framebuffer->RescaleFrameBuffer(width, height);
+	std::cout << "Width: " << width << " Height: " << height << std::endl;
+}
+
+void Test::ProcessInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+	camera->ProcessInput(window, deltaTime);
+}
+
+void Test::MouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	//std::cout << "Mouse X: " << xpos << " Mouse Y: " << ypos << std::endl;
+	camera->MouseMoveCallback(window, xpos, ypos);
+}
+
+void Test::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	//std::cout << "Button: " << button << " Action: " << action << " Mods: " << mods << std::endl;
+	camera->MouseButtonCallback(window, button, action, mods);
+}
+
+void Test::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	//std::cout << "XOffset: " << xoffset << " YOffset: " << yoffset << std::endl;
+	camera->MouseScrollCallback(window, xoffset, yoffset);
+}
+
+void Test::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	//std::cout << "Key: " << key << " Scancode: " << scancode << " Action: " << action << " Mods: " << mods << std::endl;
+	camera->KeyCallback(window, key, scancode, action, mods);
 }

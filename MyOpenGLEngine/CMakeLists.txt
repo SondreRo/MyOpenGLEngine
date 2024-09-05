@@ -39,11 +39,11 @@ set( IMGUI_SOURCE
 
 # HeaderFiles
 set (HEADER_FILES
- "core/application.h" "core/test.cpp" "core/framebuffer.cpp" "core/ShaderProgram.cpp")
+ "core/Application.h" "core/Test.cpp" "core/Framebuffer.cpp" "core/ShaderProgram.cpp" "core/Mesh.cpp" "core/Camera.cpp" "core/Transform.cpp" "core/Window.cpp" "core/Scene.cpp" "core/MeshGenerator.cpp" "core/LineMesh.cpp" "core/Material.cpp" "core/Ball.cpp")
 
  # SourceFiles
 set (SRC_FILES
-includes/glad.c "core/test.h" "core/framebuffer.h" "core/ShaderProgram.h")
+includes/glad.c "core/application.cpp" "core/Test.h" "core/Framebuffer.h" "core/ShaderProgram.h" "core/Mesh.h" "core/Vertex.h" "core/Camera.h" "core/Transform.h" "core/Window.h" "core/Scene.h" "core/MeshGenerator.h" "core/LineMesh.h" "core/Material.h" "core/Ball.h" "core/Colliders.h")
 
 
 

@@ -2,20 +2,21 @@
 //
 
 #include "MyOpenGLEngine.h"
-#include "application.h"
-#include "test.h"
+//#include "test.h"
+#include "Application.h"
+//#include "test.h"
 
 using namespace std;
 
 int main()
 {
 	cout << "Hello CMake." << endl;
-	Application::Hello();
 
-	test t;
 
-	t.MyTest();
+	//Test t;
+	//t.MyTest();
 
+	Application::Get()->Run();
 
 	return 0;
 }
