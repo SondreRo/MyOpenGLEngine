@@ -11,7 +11,11 @@ public:
 	virtual void RenderProperties() override;
 
 	glm::vec3 velocity = glm::vec3(0);
+	float Radius = 1.f;
+	SphereCollider GetSphereCollider();
 
+
+	void Resetball();
 	
 private:
 	int SubCount = 0;

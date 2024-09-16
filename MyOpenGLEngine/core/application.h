@@ -6,18 +6,23 @@
 
 class Application {
 public:
-    Application(const Application&) = delete;
-    Application(Application&&) = delete;
+    static Application& get();
 
-    static Application* Get();
+    Application(const Application&) = delete;
+    Application& operator=(const Application&) = delete;
 
     void Init();
     void InitGLFW();
     void LoadContent();
     void Run();
-private:
-    Application() = default;
 
     Scene mScene{ "Scene" };
+
+private:
+    inline static Application* instance = nullptr;
+
+    Application() = default;
+
+
     Window mWindow{ "LearnOpenGL", &mScene, 1280, 720 };
 };

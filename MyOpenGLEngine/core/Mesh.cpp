@@ -33,7 +33,8 @@ void Mesh::Draw()
 
 void Mesh::Update(float DeltaTime)
 {
-
+	Transformmat = transform.GetMatrix();
+	UpdateAABB();
 }
 
 void Mesh::Bind()
@@ -93,7 +94,43 @@ void Mesh::RenderProperties()
 	ImGui::ColorEdit3("Diffuse", glm::value_ptr(material.diffuse));
 	ImGui::ColorEdit3("Specular", glm::value_ptr(material.specular));
 	ImGui::SliderFloat("Shininess", &material.shininess, 0.0f, 256.0f);
-
+	ImGui::SliderFloat("Transparency", &material.transparency, 0.0f, 1.0f);
 	ImGui::NewLine();
 
+
+	ImGui::Checkbox("UseCollision", &UseCollision);
+}
+
+AxisAlignedBoundingBox Mesh::GetAABB()
+{
+	return aabb;
+}
+
+void Mesh::UpdateAABB()
+{
+	aabb.min = glm::vec3(FLT_MAX);
+	aabb.max = glm::vec3(-FLT_MAX);
+
+	for (auto corner : MeshCorners)
+	{
+		corner = glm::vec3(GetGlobalTransform() * glm::vec4(corner, 1));
+		aabb.min = glm::min(aabb.min, corner);
+		aabb.max = glm::max(aabb.max, corner);
+	}
+}
+
+void Mesh::AddChild(Mesh* mesh)
+{
+	mesh->Parent = this;
+	Children.push_back(mesh);
+}
+
+glm::mat4 Mesh::GetTransformMat()
+{
+	return Transformmat;
+}
+
+glm::mat4 Mesh::GetGlobalTransform()
+{
+	return ParentMatrix * GetTransformMat();
 }

@@ -131,6 +131,9 @@ void MeshGenerator::GenerateCubeWithHardEdges(Mesh* inMesh, glm::vec3 Size)
 		inMesh->indices.push_back(startIndex + 4);
 		inMesh->indices.push_back(startIndex + 5);
 	}
+
+	GetMeshCorners(inMesh);
+	inMesh->UseCollision = true;
 }
 
 void MeshGenerator::GenerateSphere(Mesh* inMesh, float Radius, int Sectors, int Stacks)
@@ -223,6 +226,9 @@ void MeshGenerator::GenerateIcosahedron(Mesh* inMesh, int n)
 	}*/
 
 	//end timer
+	inMesh->UseCollision = true;
+
+	GetMeshCorners(inMesh);
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time to generate sphere: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
 }
@@ -281,3 +287,47 @@ void MeshGenerator::Subdivide(Vertex a, Vertex b, Vertex c, int n, Mesh* inMesh)
 		
 	}
 }
+
+std::vector<glm::vec3> MeshGenerator::GetMeshCorners(Mesh* inMesh)
+{
+	//Find all corners of the mesh
+	float MaxX = -FLT_MAX;
+	float MaxY = -FLT_MAX;
+	float MaxZ = -FLT_MAX;
+
+	float MinX = FLT_MAX;
+	float MinY = FLT_MAX;
+	float MinZ = FLT_MAX;
+
+
+	for (auto vertex: inMesh->vertices)
+	{
+		//Find the min and max of the x, y and z values
+
+		MaxX = glm::max(MaxX, vertex.position.x);
+		MaxY = glm::max(MaxY, vertex.position.y);
+		MaxZ = glm::max(MaxZ, vertex.position.z);
+
+		MinX = glm::min(MinX, vertex.position.x);
+		MinY = glm::min(MinY, vertex.position.y);
+		MinZ = glm::min(MinZ, vertex.position.z);
+
+	}
+
+	std::vector<glm::vec3> corners;
+	corners.resize(8);
+
+	corners = {
+		glm::vec3(MinX, MinY, MinZ),
+		glm::vec3(MaxX, MinY, MinZ),
+		glm::vec3(MaxX, MaxY, MinZ),
+		glm::vec3(MinX, MaxY, MinZ),
+		glm::vec3(MinX, MinY, MaxZ),
+		glm::vec3(MaxX, MinY, MaxZ),
+		glm::vec3(MaxX, MaxY, MaxZ),
+		glm::vec3(MinX, MaxY, MaxZ)
+	};
+	inMesh->MeshCorners = corners;
+	return corners;
+};
+

@@ -217,7 +217,7 @@ int Test::MyTest()
 
         shaderProgram->UseProgram();
 
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(TriangleMesh->transform.GetMatrix()));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(TriangleMesh->GetTransformMat()));
         //TriangleMesh->Draw();
         
 

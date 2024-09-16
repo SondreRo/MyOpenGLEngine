@@ -16,7 +16,7 @@ int main()
 	//Test t;
 	//t.MyTest();
 
-	Application::Get()->Run();
+	Application::get().Run();
 
 	return 0;
 }

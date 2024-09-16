@@ -3,9 +3,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-Application* Application::Get() {
-    static Application* app = new Application;
-    return app;
+Application& Application::get()
+{
+    if (nullptr == instance)
+    {
+        instance = new Application;
+    }
+
+    return *instance;
 }
 
 void Application::Init()
@@ -50,6 +55,7 @@ void Application::Run()
         mWindow.Update(deltaTime);
         mWindow.Render(deltaTime);
         mWindow.EndFrame();
+        //std::cout << "DeltaTime: " << 1/deltaTime << std::endl;
     }
 
     //Mesh::ClearCache();

@@ -10,15 +10,15 @@ glm::mat4 Transform::GetMatrix()
     glm::mat4 ModelMatrix = glm::mat4(1);
 
     ModelMatrix = glm::translate(ModelMatrix, Location);
-    ModelMatrix = glm::scale(ModelMatrix, Scale);
 
     glm::vec3 eulerAngles = glm::eulerAngles(orientation);
     eulerAngles.x = glm::radians(Pitch);
     eulerAngles.y = glm::radians(Yaw);
     eulerAngles.z = glm::radians(Roll);
     orientation = glm::quat(eulerAngles);
-
     ModelMatrix *= (glm::mat4)orientation;
+
+    ModelMatrix = glm::scale(ModelMatrix, Scale);
 
     return ModelMatrix;
 

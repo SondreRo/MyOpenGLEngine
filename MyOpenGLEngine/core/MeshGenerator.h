@@ -2,9 +2,16 @@
 
 #include <glm/glm.hpp>
 #include "mesh.h"
-
+#include <array>
 class MeshGenerator {
 public:
+
+	enum MeshType {
+		Cube,
+		CubeHardEdges,
+		Icosahedron,
+		PoolTable
+	};
 
 	static glm::vec3 GetNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
 
@@ -19,4 +26,6 @@ public:
 
 	static void ToUnitSphere(Mesh* inMesh);
 	static void Subdivide(Vertex a, Vertex b, Vertex c, int n, Mesh* inMesh);
+
+	static std::vector<glm::vec3> GetMeshCorners(Mesh* inMesh);
 };
