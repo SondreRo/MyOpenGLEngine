@@ -2,10 +2,12 @@
 
 #include "imgui.h"
 #include "MeshGenerator.h"
+#include "math.h"
 
 Ball::Ball(std::string inName)
 {
 	name = inName;
+	sphereCollider = SphereCollider(transform.GetLocation(), Radius);
 }
 
 Ball::~Ball()
@@ -17,21 +19,39 @@ void Ball::Update(float DeltaTime)
 {
 	Mesh::Update(DeltaTime);
 
+	sphereCollider.center = transform.GetLocation();
+	sphereCollider.radius = Radius;
+
 	// Check that the velocity is valid
-	if (velocity.x != velocity.x)
-	{
-		velocity.x = 0;
-	}
-	if (velocity.y != velocity.y)
-	{
-		velocity.y = 0;
 
-	}
-	if (velocity.z != velocity.z)
+	if (isnan(velocity.x))
 	{
-		velocity.z = 0;
+		Resetball();
+	}
+	if (isnan(velocity.y))
+	{
+		Resetball();
+	}
+	if (isnan(velocity.z))
+	{
+		Resetball();
 	}
 
+
+	if (isnan(transform.GetLocation().x))
+	{
+		Resetball();
+	}
+
+	if (isnan(transform.GetLocation().y))
+	{
+		Resetball();
+	}
+
+	if (isnan(transform.GetLocation().z))
+	{
+		Resetball();
+	}
 
 	transform.AddLocation(velocity * DeltaTime);
 
@@ -78,8 +98,7 @@ void Ball::RenderProperties()
 SphereCollider Ball::GetSphereCollider()
 {
 	//SphereCollider collider{ GetGlobalTransform() * glm::vec4(transform.GetLocation(), 1), Radius};
-	SphereCollider collider{transform.GetLocation(), Radius};
-	return collider;
+	return sphereCollider;
 }
 
 void Ball::Resetball()

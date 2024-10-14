@@ -33,6 +33,8 @@ struct Material
 };
 
 void main()
+
+
 {
     DirectionalLight dl;
     dl.direction = normalize(lightDirection);

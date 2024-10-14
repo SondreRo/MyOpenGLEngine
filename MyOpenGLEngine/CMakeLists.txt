@@ -39,11 +39,11 @@ set( IMGUI_SOURCE
 
 # HeaderFiles
 set (HEADER_FILES
- "core/Application.h" "core/Test.cpp" "core/Framebuffer.cpp" "core/ShaderProgram.cpp" "core/Mesh.cpp" "core/Camera.cpp" "core/Transform.cpp" "core/Window.cpp" "core/Scene.cpp" "core/MeshGenerator.cpp" "core/LineMesh.cpp" "core/Material.cpp" "core/Ball.cpp" "core/Collision/OcTree.cpp" "core/Collision/CollisionManager.cpp" "core/Collision/Colliders.cpp")
+ "core/Application.h" "core/Test.cpp" "core/Framebuffer.cpp" "core/ShaderProgram.cpp" "core/Mesh.cpp" "core/Camera.cpp" "core/Transform.cpp" "core/Window.cpp" "core/Scene.cpp" "core/MeshGenerator.cpp" "core/LineMesh.cpp" "core/Material.cpp" "core/Ball.cpp" "core/Collision/OcTree.cpp" "core/Collision/CollisionManager.cpp" "core/Collision/Colliders.cpp"   "core/ECS/EntityComponentSystemManager.cpp")
 
  # SourceFiles
 set (SRC_FILES
-includes/glad.c "core/application.cpp" "core/Test.h" "core/Framebuffer.h" "core/ShaderProgram.h" "core/Mesh.h" "core/Vertex.h" "core/Camera.h" "core/Transform.h" "core/Window.h" "core/Scene.h" "core/MeshGenerator.h" "core/LineMesh.h" "core/Material.h" "core/Ball.h" "core/Collision/Colliders.h" "core/Collision/OcTree.h" "core/Collision/CollisionManager.h" "core/Timer.h" "core/Collision/OcTreeNode.h")
+includes/glad.c "core/application.cpp" "core/Test.h" "core/Framebuffer.h" "core/ShaderProgram.h" "core/Mesh.h" "core/Vertex.h" "core/Camera.h" "core/Transform.h" "core/Window.h" "core/Scene.h" "core/MeshGenerator.h" "core/LineMesh.h" "core/Material.h" "core/Ball.h" "core/Collision/Colliders.h" "core/Collision/OcTree.h" "core/Collision/CollisionManager.h" "core/Timer.h" "core/Collision/OcTreeNode.h" "core/Actor.h" "ActorComponent.h"       "core/ECS/Components/ComponentBase.h" "core/ECS/EntityComponentSystemManager.h")
 
 
 

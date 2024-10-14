@@ -11,7 +11,7 @@
 #include "Material.h"
 #include <queue>
 #include <chrono>
-
+#include "actor.h"
 
 
 Scene::Scene(const std::string& name)
@@ -90,8 +90,8 @@ void Scene::LoadContent()
 	Mesh* BottomWall = CreateAndRegisterMesh<Mesh>("BottomWall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
 	BottomWall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
 
-	//MeshGenerator::GeneratePoolTable(FloorMesh, TopWall, BottomWall, RighWall, Leftwall, glm::vec3(200.f, 10.f, 200.f));
-	MeshGenerator::GeneratePoolTable(FloorMesh, TopWall, BottomWall, RighWall, Leftwall, glm::vec3(20, 2, 40));
+	MeshGenerator::GeneratePoolTable(FloorMesh, TopWall, BottomWall, RighWall, Leftwall, glm::vec3(200.f, 10.f, 200.f));
+	//MeshGenerator::GeneratePoolTable(FloorMesh, TopWall, BottomWall, RighWall, Leftwall, glm::vec3(20, 2, 40));
 
 	FloorMesh->Static = true;
 	RighWall->Static = true;
@@ -195,24 +195,24 @@ void Scene::LoadContent()
 	// Light Yellow
 	BallMesh13->material.diffuse = glm::vec3(1.f, 1.f, 0.5f);
 
-	//int BallCount = 0;
+	int BallCount = 0;
 
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	for (int y = 0; y < 10; y++)
-	//	{
-	//		glm::vec3 randomvelocity = glm::vec3(rand() % 20, 0, rand() % 20) - 10.f;
-	//		randomvelocity.y = 0;
-	//		std::string BallName = "BallMesh" + std::to_string(i) + std::to_string(y);
-	//		Ball* BallMesh = CreateAndRegisterMesh<Ball>(BallName, glm::vec3(2 * i, 2, 2 * y), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	//		MeshGenerator::GenerateIcosahedron(BallMesh, 3);
-	//		BallMesh->velocity = randomvelocity;
-	//		BallMesh->material.diffuse = glm::vec3(rand() % 100 / 100.f, rand() % 100 / 100.f, rand() % 100 / 100.f);
-	//		BallCount++;
-	//	}
-	//	
-	//}
-	//std::cout << "Created " << BallCount << " Balls" << std::endl;
+	for (int i = 0; i < 10; i++)
+	{
+		for (int y = 0; y < 10; y++)
+		{
+			glm::vec3 randomvelocity = glm::vec3(rand() % 20, 0, rand() % 20) - 10.f;
+			randomvelocity.y = 0;
+			std::string BallName = "BallMesh" + std::to_string(i) + std::to_string(y);
+			Ball* BallMesh = CreateAndRegisterMesh<Ball>(BallName, glm::vec3(2 * i, 2, 2 * y), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+			MeshGenerator::GenerateIcosahedron(BallMesh, 3);
+			BallMesh->velocity = randomvelocity;
+			BallMesh->material.diffuse = glm::vec3(rand() % 100 / 100.f, rand() % 100 / 100.f, rand() % 100 / 100.f);
+			BallCount++;
+		}
+		
+	}
+	std::cout << "Created " << BallCount << " Balls" << std::endl;
 
 
 	/*Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(5, 5, 0), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);

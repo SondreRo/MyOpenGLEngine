@@ -123,13 +123,13 @@ void MeshGenerator::GenerateCubeWithHardEdges(Mesh* inMesh, glm::vec3 Size)
 
 		// Add the indices (6 indices for two triangles)
 		unsigned int startIndex = i * 6; // Each face adds 6 vertices (2 triangles)
-		inMesh->indices.push_back(startIndex + 0);
-		inMesh->indices.push_back(startIndex + 1);
 		inMesh->indices.push_back(startIndex + 2);
+		inMesh->indices.push_back(startIndex + 1);
+		inMesh->indices.push_back(startIndex + 0);
 
-		inMesh->indices.push_back(startIndex + 3);
-		inMesh->indices.push_back(startIndex + 4);
 		inMesh->indices.push_back(startIndex + 5);
+		inMesh->indices.push_back(startIndex + 4);
+		inMesh->indices.push_back(startIndex + 3);
 	}
 
 	GetMeshCorners(inMesh);

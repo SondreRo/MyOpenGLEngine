@@ -12,10 +12,15 @@ public:
 
 	glm::vec3 velocity = glm::vec3(0);
 	float Radius = 1.f;
+	SphereCollider sphereCollider;
 	SphereCollider GetSphereCollider();
 
 
 	void Resetball();
+
+	int TestVariable;
+
+
 	
 private:
 	int SubCount = 0;
