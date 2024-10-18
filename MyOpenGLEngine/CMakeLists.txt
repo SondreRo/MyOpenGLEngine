@@ -39,11 +39,11 @@ set( IMGUI_SOURCE
 
 # HeaderFiles
 set (HEADER_FILES
- "core/Application.h" "core/Test.cpp" "core/Framebuffer.cpp" "core/ShaderProgram.cpp" "core/Mesh.cpp" "core/Camera.cpp" "core/Transform.cpp" "core/Window.cpp" "core/Scene.cpp" "core/MeshGenerator.cpp" "core/LineMesh.cpp" "core/Material.cpp" "core/Ball.cpp" "core/Collision/OcTree.cpp" "core/Collision/CollisionManager.cpp" "core/Collision/Colliders.cpp"   "core/ECS/EntityComponentSystemManager.cpp")
-
+ "core/Application.h" "core/Test.h" "core/Framebuffer.h" "core/ShaderProgram.h" "core/Mesh.h" "core/Vertex.h" "core/Camera.h" "core/Transform.h" "core/Window.h" "core/Scene.h" "core/MeshGenerator.h" "core/LineMesh.h" "core/Material.h" "core/Ball.h" "core/Collision/Colliders.h" "core/Collision/OcTree.h" "core/Collision/CollisionManager.h" "core/Timer.h" "core/Collision/OcTreeNode.h" "core/Actor.h" "ActorComponent.h"  "core/ECS/Entity.h" "core/ECS/Components/ComponentBase.h" "core/ECS/Systems/SystemBase.h" "core/ECS/ECSManager.h" "core/ECS/Components/MovementComponent.h" "core/ECS/Systems/MovementSystem.h" "core/ECS/ComponentHandler/ComponentHandler.h" "core/ECS/ComponentHandler/HandlerInterface.h" "core/ECS/Components/TransformComponent.h" "core/ECS/Components/MeshComponent.h" "core/ECS/Components/HealthComponent.h" "core/ECS/Components/CombatComponent.h")
+ 
  # SourceFiles
 set (SRC_FILES
-includes/glad.c "core/application.cpp" "core/Test.h" "core/Framebuffer.h" "core/ShaderProgram.h" "core/Mesh.h" "core/Vertex.h" "core/Camera.h" "core/Transform.h" "core/Window.h" "core/Scene.h" "core/MeshGenerator.h" "core/LineMesh.h" "core/Material.h" "core/Ball.h" "core/Collision/Colliders.h" "core/Collision/OcTree.h" "core/Collision/CollisionManager.h" "core/Timer.h" "core/Collision/OcTreeNode.h" "core/Actor.h" "ActorComponent.h"       "core/ECS/Components/ComponentBase.h" "core/ECS/EntityComponentSystemManager.h")
+includes/glad.c "core/application.cpp"   "core/Test.cpp" "core/Framebuffer.cpp" "core/ShaderProgram.cpp" "core/Mesh.cpp" "core/Camera.cpp" "core/Transform.cpp" "core/Window.cpp" "core/Scene.cpp" "core/MeshGenerator.cpp" "core/LineMesh.cpp" "core/Material.cpp" "core/Ball.cpp" "core/Collision/OcTree.cpp" "core/Collision/CollisionManager.cpp" "core/Collision/Colliders.cpp"  "core/ECS/ECSManager.cpp" "core/ECS/Systems/MeshSystem.h" "core/ECS/Systems/MovementSystem.cpp" "core/ECS/Systems/CombatSystem.h" "core/ECS/Systems/CombatSystem.cpp")
 
 
 

@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "glad/glad.h"
+#include "glm/gtc/type_ptr.hpp"
 
 int ShaderProgram::ReadShaderFile(const std::string& VertexPath, const std::string& FragmentPath)
 {
@@ -110,4 +111,25 @@ unsigned ShaderProgram::CreateProgram()
 void ShaderProgram::UseProgram()
 {
 	glUseProgram(shaderProgram);
+}
+
+void ShaderProgram::SetUniform1i(const std::string& name, int value)
+{
+	glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
+}
+
+void ShaderProgram::SetUniform1f(const std::string& name, float value)
+{
+	glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
+}
+
+void ShaderProgram::SetUniform3f(const std::string& name, glm::vec3 value)
+{
+	glUniform3fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, glm::value_ptr(value));
+}
+
+void ShaderProgram::SetUniformMat4(const std::string& name, glm::mat4 value)
+{
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+
 }

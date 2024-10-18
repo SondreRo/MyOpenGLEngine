@@ -13,7 +13,6 @@
 #include <chrono>
 #include "actor.h"
 
-
 Scene::Scene(const std::string& name)
 {
 }
@@ -40,7 +39,8 @@ void Scene::LoadContent()
 	lineShaderProgram->CompileShaders();
 	lineShaderProgram->CreateProgram();
 
-
+	Shaders["DefaultShader"] = shaderProgram;
+	Shaders["LineShader"] = lineShaderProgram;
 
 	RootMesh = new Mesh("RootMesh");
 	RootMesh->shaderProgram = shaderProgram;
@@ -100,7 +100,6 @@ void Scene::LoadContent()
 	BottomWall->Static = true;
 
 
-
 	//for (int i = 0; i < 10; ++i)
 	//{
 
@@ -124,95 +123,95 @@ void Scene::LoadContent()
 
 	// generate this strucutre
 
-	Ball* MainBall = CreateAndRegisterMesh<Ball>("MainBall", glm::vec3(0, 1, 4), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(MainBall, 3);
-	MainBall->material.diffuse = glm::vec3(1.f, 1.f, 1.f);
+	//Ball* MainBall = CreateAndRegisterMesh<Ball>("MainBall", glm::vec3(0, 1, 4), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(MainBall, 3);
+	//MainBall->material.diffuse = glm::vec3(1.f, 1.f, 1.f);
 
 
-	Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(0, 1, -5), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh, 3);
-	// Yellow
-	BallMesh->material.diffuse = glm::vec3(1.f, 1.f, 0.f);
+	//Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(0, 1, -5), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh, 3);
+	//// Yellow
+	//BallMesh->material.diffuse = glm::vec3(1.f, 1.f, 0.f);
 
-	Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(1, 1, -6), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh2, 3);
-	// Blue
-	BallMesh2->material.diffuse = glm::vec3(0.f, 0.f, 1.f);
+	//Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(1, 1, -6), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh2, 3);
+	//// Blue
+	//BallMesh2->material.diffuse = glm::vec3(0.f, 0.f, 1.f);
 
-	Ball* BallMesh3 = CreateAndRegisterMesh<Ball>("BallMesh3", glm::vec3(-1, 1, -6), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh3, 3);
-	// Red
-	BallMesh3->material.diffuse = glm::vec3(1.f, 0.f, 0.f);
+	//Ball* BallMesh3 = CreateAndRegisterMesh<Ball>("BallMesh3", glm::vec3(-1, 1, -6), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh3, 3);
+	//// Red
+	//BallMesh3->material.diffuse = glm::vec3(1.f, 0.f, 0.f);
 
-	Ball* BallMesh4 = CreateAndRegisterMesh<Ball>("BallMesh4", glm::vec3(2, 1, -7), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh4, 3);
-	// Purple
-	BallMesh4->material.diffuse = glm::vec3(1.f, 0.f, 1.f);
+	//Ball* BallMesh4 = CreateAndRegisterMesh<Ball>("BallMesh4", glm::vec3(2, 1, -7), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh4, 3);
+	//// Purple
+	//BallMesh4->material.diffuse = glm::vec3(1.f, 0.f, 1.f);
 
-	Ball* BallMesh5 = CreateAndRegisterMesh<Ball>("BallMesh5", glm::vec3(0, 1, -7), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh5, 3);
-	// Orange
-	BallMesh5->material.diffuse = glm::vec3(1.f, 0.5f, 0.f);
+	//Ball* BallMesh5 = CreateAndRegisterMesh<Ball>("BallMesh5", glm::vec3(0, 1, -7), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh5, 3);
+	//// Orange
+	//BallMesh5->material.diffuse = glm::vec3(1.f, 0.5f, 0.f);
 
-	Ball* BallMesh6 = CreateAndRegisterMesh<Ball>("BallMesh6", glm::vec3(-2, 1, -7), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh6, 3);
-	// Green
-	BallMesh6->material.diffuse = glm::vec3(0.f, 1.f, 0.f);
+	//Ball* BallMesh6 = CreateAndRegisterMesh<Ball>("BallMesh6", glm::vec3(-2, 1, -7), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh6, 3);
+	//// Green
+	//BallMesh6->material.diffuse = glm::vec3(0.f, 1.f, 0.f);
 
-	Ball* BallMesh7 = CreateAndRegisterMesh<Ball>("BallMesh7", glm::vec3(3, 1, -8), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh7, 3);
-	// Brown
-	BallMesh7->material.diffuse = glm::vec3(0.5f, 0.25f, 0.f);
+	//Ball* BallMesh7 = CreateAndRegisterMesh<Ball>("BallMesh7", glm::vec3(3, 1, -8), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh7, 3);
+	//// Brown
+	//BallMesh7->material.diffuse = glm::vec3(0.5f, 0.25f, 0.f);
 
-	Ball* BallMesh8 = CreateAndRegisterMesh<Ball>("BallMesh8", glm::vec3(1, 1, -8), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh8, 3);
-	// Black
-	BallMesh8->material.diffuse = glm::vec3(0.f, 0.f, 0.f);
+	//Ball* BallMesh8 = CreateAndRegisterMesh<Ball>("BallMesh8", glm::vec3(1, 1, -8), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh8, 3);
+	//// Black
+	//BallMesh8->material.diffuse = glm::vec3(0.f, 0.f, 0.f);
 
-	Ball* BallMesh9 = CreateAndRegisterMesh<Ball>("BallMesh9", glm::vec3(-1, 1, -8), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh9, 3);
-	// Pin
-	BallMesh9->material.diffuse = glm::vec3(1.f, 0.5f, 1.f);
+	//Ball* BallMesh9 = CreateAndRegisterMesh<Ball>("BallMesh9", glm::vec3(-1, 1, -8), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh9, 3);
+	//// Pin
+	//BallMesh9->material.diffuse = glm::vec3(1.f, 0.5f, 1.f);
 
-	Ball* BallMesh10 = CreateAndRegisterMesh<Ball>("BallMesh9", glm::vec3(-3, 1, -8), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh10, 3);
-	// Light Blue
-	BallMesh10->material.diffuse = glm::vec3(0.f, 1.f, 1.f);
+	//Ball* BallMesh10 = CreateAndRegisterMesh<Ball>("BallMesh9", glm::vec3(-3, 1, -8), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh10, 3);
+	//// Light Blue
+	//BallMesh10->material.diffuse = glm::vec3(0.f, 1.f, 1.f);
 
 
-	Ball* BallMesh11 = CreateAndRegisterMesh<Ball>("BallMesh10", glm::vec3(2, 1, -9), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh11, 3);
-	// Light Blue
-	BallMesh11->material.diffuse = glm::vec3(0.f, 1.f, 1.f);
+	//Ball* BallMesh11 = CreateAndRegisterMesh<Ball>("BallMesh10", glm::vec3(2, 1, -9), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh11, 3);
+	//// Light Blue
+	//BallMesh11->material.diffuse = glm::vec3(0.f, 1.f, 1.f);
 
-	Ball* BallMesh12 = CreateAndRegisterMesh<Ball>("BallMesh11", glm::vec3(0, 1, -9), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh12, 3);
-	// Light Green
-	BallMesh12->material.diffuse = glm::vec3(0.5f, 1.f, 0.5f);
+	//Ball* BallMesh12 = CreateAndRegisterMesh<Ball>("BallMesh11", glm::vec3(0, 1, -9), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh12, 3);
+	//// Light Green
+	//BallMesh12->material.diffuse = glm::vec3(0.5f, 1.f, 0.5f);
 
-	Ball* BallMesh13 = CreateAndRegisterMesh<Ball>("BallMesh12", glm::vec3(-2, 1, -9), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh13, 3);
-	// Light Yellow
-	BallMesh13->material.diffuse = glm::vec3(1.f, 1.f, 0.5f);
+	//Ball* BallMesh13 = CreateAndRegisterMesh<Ball>("BallMesh12", glm::vec3(-2, 1, -9), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh13, 3);
+	//// Light Yellow
+	//BallMesh13->material.diffuse = glm::vec3(1.f, 1.f, 0.5f);
 
-	int BallCount = 0;
+	//int BallCount = 0;
 
-	for (int i = 0; i < 10; i++)
-	{
-		for (int y = 0; y < 10; y++)
-		{
-			glm::vec3 randomvelocity = glm::vec3(rand() % 20, 0, rand() % 20) - 10.f;
-			randomvelocity.y = 0;
-			std::string BallName = "BallMesh" + std::to_string(i) + std::to_string(y);
-			Ball* BallMesh = CreateAndRegisterMesh<Ball>(BallName, glm::vec3(2 * i, 2, 2 * y), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-			MeshGenerator::GenerateIcosahedron(BallMesh, 3);
-			BallMesh->velocity = randomvelocity;
-			BallMesh->material.diffuse = glm::vec3(rand() % 100 / 100.f, rand() % 100 / 100.f, rand() % 100 / 100.f);
-			BallCount++;
-		}
-		
-	}
-	std::cout << "Created " << BallCount << " Balls" << std::endl;
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	for (int y = 0; y < 10; y++)
+	//	{
+	//		glm::vec3 randomvelocity = glm::vec3(rand() % 20, 0, rand() % 20) - 10.f;
+	//		randomvelocity.y = 0;
+	//		std::string BallName = "BallMesh" + std::to_string(i) + std::to_string(y);
+	//		Ball* BallMesh = CreateAndRegisterMesh<Ball>(BallName, glm::vec3(2 * i, 2, 2 * y), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//		MeshGenerator::GenerateIcosahedron(BallMesh, 3);
+	//		BallMesh->velocity = randomvelocity;
+	//		BallMesh->material.diffuse = glm::vec3(rand() % 100 / 100.f, rand() % 100 / 100.f, rand() % 100 / 100.f);
+	//		BallCount++;
+	//	}
+	//	
+	//}
+	//std::cout << "Created " << BallCount << " Balls" << std::endl;
 
 
 	/*Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(5, 5, 0), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
@@ -259,6 +258,8 @@ void Scene::LoadContent()
 	//FloorMesh->AddChild.push_back(BottomWall);
 
 	//RootMesh->AddChild.push_back(FloorMesh);
+
+	ecs_manager.Setup();
 }
 
 void Scene::UnloadContent()
@@ -298,7 +299,7 @@ void Scene::Update(float DeltaTime)
 	//std::cout << "Updating Scene" << std::endl;
 	UpdateSceneGraph(DeltaTime, RootMesh, glm::mat4(1));
 	collision_manager->Update(DeltaTime);
-
+	ecs_manager.Update(DeltaTime);
 		//end timer
 	//EndTimer("Update");
 }
@@ -331,6 +332,9 @@ void Scene::Render(float DeltaTime, int width, int height)
 	RenderSceneGraphVisuals();
 	collision_manager->Render(lineMesh);
 	//lineMesh->AddLine(glm::vec3(0, 0, 0), glm::vec3(10, 5, 2));
+
+	ecs_manager.Render();
+
 	ImGui::Begin("Mesh Properties");
 	if (SelectedMesh != nullptr)
 	{
@@ -418,7 +422,6 @@ void Scene::RenderSceneGraph(Mesh* mesh, float DeltaTime, int width, int height,
 	{
 		RenderSceneGraph(child, DeltaTime, width, height, ParentTransform * mesh->GetTransformMat());
 	}
-
 }
 
 void Scene::ReadyRenderData(ShaderProgram* shader, Mesh* mesh, glm::mat4 parentTransform, int width,int height)

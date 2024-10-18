@@ -10,6 +10,9 @@
 #include "Collision/CollisionManager.h"
 #include "MeshGenerator.h"
 #include <unordered_map>
+
+#include "ECS/ECSManager.h"
+
 class Window;
 
 class Scene {
@@ -54,7 +57,10 @@ public:
 	Mesh* SunMesh;
 	//ShaderProgram* shaderProgram;
 
+	ECSManager ecs_manager;
+
 	std::unordered_map<std::string, Mesh*> Meshes;
+	std::unordered_map<std::string, ShaderProgram*> Shaders;
 
 
 	// Callbacks for window events
