@@ -136,6 +136,71 @@ void MeshGenerator::GenerateCubeWithHardEdges(Mesh* inMesh, glm::vec3 Size)
 	inMesh->UseCollision = true;
 }
 
+void MeshGenerator::GenerateCubeWithHardEdges(MeshBase* inMesh, glm::vec3 Size)
+{
+	glm::vec3 halfSize = Size * 0.5f;
+
+	// Define the 8 vertices of the cube
+	glm::vec3 v0 = { -halfSize.x, -halfSize.y, -halfSize.z };
+	glm::vec3 v1 = { halfSize.x, -halfSize.y, -halfSize.z };
+	glm::vec3 v2 = { halfSize.x,  halfSize.y, -halfSize.z };
+	glm::vec3 v3 = { -halfSize.x,  halfSize.y, -halfSize.z };
+	glm::vec3 v4 = { -halfSize.x, -halfSize.y,  halfSize.z };
+	glm::vec3 v5 = { halfSize.x, -halfSize.y,  halfSize.z };
+	glm::vec3 v6 = { halfSize.x,  halfSize.y,  halfSize.z };
+	glm::vec3 v7 = { -halfSize.x,  halfSize.y,  halfSize.z };
+
+	// Define the faces and normals for each face of the cube
+	glm::vec3 normals[6] = {
+		{ 0.0f,  0.0f, -1.0f},  // Front face
+		{ 0.0f,  0.0f,  1.0f},  // Back face
+		{ 0.0f,  1.0f,  0.0f},  // Top face
+		{ 0.0f, -1.0f,  0.0f},  // Bottom face
+		{-1.0f,  0.0f,  0.0f},  // Left face
+		{ 1.0f,  0.0f,  0.0f},  // Right face
+	};
+
+	// Define the vertex positions and normals for each face (6 faces, 2 triangles per face)
+	// Each face is defined by 4 vertices and split into 2 triangles
+	std::vector<glm::vec3> faceVertices[6] = {
+		{v0, v1, v2, v3},  // Front face
+		{v5, v4, v7, v6},  // Back face
+		{v3, v2, v6, v7},  // Top face
+		{v0, v4, v5, v1},  // Bottom face
+		{v0, v3, v7, v4},  // Left face
+		{v1, v5, v6, v2},  // Right face
+
+	};
+
+	// Add vertices and indices for each face
+	for (int i = 0; i < 6; ++i) {
+		glm::vec3 normal = normals[i];
+
+		// Define two triangles per face (faceVertices[i] contains the 4 vertices of the face)
+		// First triangle (v0, v1, v2)
+		inMesh->vertices.emplace_back(faceVertices[i][0], normal);
+		inMesh->vertices.emplace_back(faceVertices[i][1], normal);
+		inMesh->vertices.emplace_back(faceVertices[i][2], normal);
+
+		// Second triangle (v2, v3, v0)
+		inMesh->vertices.emplace_back(faceVertices[i][2], normal);
+		inMesh->vertices.emplace_back(faceVertices[i][3], normal);
+		inMesh->vertices.emplace_back(faceVertices[i][0], normal);
+
+		// Add the indices (6 indices for two triangles)
+		unsigned int startIndex = i * 6; // Each face adds 6 vertices (2 triangles)
+		inMesh->indices.push_back(startIndex + 2);
+		inMesh->indices.push_back(startIndex + 1);
+		inMesh->indices.push_back(startIndex + 0);
+
+		inMesh->indices.push_back(startIndex + 5);
+		inMesh->indices.push_back(startIndex + 4);
+		inMesh->indices.push_back(startIndex + 3);
+	}
+
+	GetMeshCorners(inMesh);
+}
+
 void MeshGenerator::GenerateSphere(Mesh* inMesh, float Radius, int Sectors, int Stacks)
 {
 
@@ -288,7 +353,7 @@ void MeshGenerator::Subdivide(Vertex a, Vertex b, Vertex c, int n, Mesh* inMesh)
 	}
 }
 
-std::vector<glm::vec3> MeshGenerator::GetMeshCorners(Mesh* inMesh)
+void MeshGenerator::GetMeshCorners(Mesh* inMesh)
 {
 	//Find all corners of the mesh
 	float MaxX = -FLT_MAX;
@@ -328,6 +393,47 @@ std::vector<glm::vec3> MeshGenerator::GetMeshCorners(Mesh* inMesh)
 		glm::vec3(MinX, MaxY, MaxZ)
 	};
 	inMesh->MeshCorners = corners;
-	return corners;
+}
+
+void MeshGenerator::GetMeshCorners(MeshBase* inMesh)
+{
+	//Find all corners of the mesh
+	float MaxX = -FLT_MAX;
+	float MaxY = -FLT_MAX;
+	float MaxZ = -FLT_MAX;
+
+	float MinX = FLT_MAX;
+	float MinY = FLT_MAX;
+	float MinZ = FLT_MAX;
+
+
+	for (auto vertex : inMesh->vertices)
+	{
+		//Find the min and max of the x, y and z values
+
+		MaxX = glm::max(MaxX, vertex.position.x);
+		MaxY = glm::max(MaxY, vertex.position.y);
+		MaxZ = glm::max(MaxZ, vertex.position.z);
+
+		MinX = glm::min(MinX, vertex.position.x);
+		MinY = glm::min(MinY, vertex.position.y);
+		MinZ = glm::min(MinZ, vertex.position.z);
+
+	}
+
+	std::vector<glm::vec3> corners;
+	corners.resize(8);
+
+	corners = {
+		glm::vec3(MinX, MinY, MinZ),
+		glm::vec3(MaxX, MinY, MinZ),
+		glm::vec3(MaxX, MaxY, MinZ),
+		glm::vec3(MinX, MaxY, MinZ),
+		glm::vec3(MinX, MinY, MaxZ),
+		glm::vec3(MaxX, MinY, MaxZ),
+		glm::vec3(MaxX, MaxY, MaxZ),
+		glm::vec3(MinX, MaxY, MaxZ)
+	};
+	inMesh->MeshCorners = corners;
 };
 

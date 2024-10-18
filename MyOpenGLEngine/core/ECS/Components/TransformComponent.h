@@ -1,16 +1,22 @@
 #pragma once
-#include "ComponentBase.h"
+#include "componentBase.h"
 #include "../core/Transform.h"
 
-class TransformComponent : public ComponentBase {
+class TransformComponent : public ComponentBase
+{
 public:
 	TransformComponent() = default;
-	TransformComponent(Transform inTransform) {
-		transform = inTransform;
-	}
-	TransformComponent(glm::vec3 inLocation) {
-		transform.SetLocation(inLocation);
+
+	TransformComponent(glm::vec3 position)
+	{
+		transform.SetLocation(position);
 	}
 
-	Transform transform = Transform();
+	TransformComponent(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) {
+		transform.SetLocation(position);
+		transform.SetRotation(rotation);
+		transform.SetScale(scale);
+	}
+
+	Transform transform;
 };

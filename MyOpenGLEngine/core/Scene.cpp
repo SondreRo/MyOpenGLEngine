@@ -49,7 +49,7 @@ void Scene::LoadContent()
 	Meshes["SunMesh"] = SunMesh;
 	MeshGenerator::GenerateCube(SunMesh, glm::vec3(0.1f));
 	SunMesh->shaderProgram = shaderProgram;
-	SunMesh->transform.SetRotation(glm::vec3(33.35f, 0.f, -20.5f));
+	SunMesh->transform.SetRotation(glm::vec3(-33.35f, 0.f, -20.5f));
 	RootMesh->Children.push_back(SunMesh);
 
 	lineMesh = new LineMesh("LineMesh");
@@ -70,8 +70,8 @@ void Scene::LoadContent()
 
 
 
-	Mesh* BigBoxMesh = CreateAndRegisterMesh<Mesh>("BigBoxMesh", glm::vec3(-7.f, 7, 0), glm::vec3(0.f), glm::vec3(1.f), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateCubeWithHardEdges(BigBoxMesh, glm::vec3(1.0f, 1.f, 1.0f));
+	//Mesh* BigBoxMesh = CreateAndRegisterMesh<Mesh>("BigBoxMesh", glm::vec3(-7.f, 7, 0), glm::vec3(0.f), glm::vec3(1.f), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateCubeWithHardEdges(BigBoxMesh, glm::vec3(1.0f, 1.f, 1.0f));
 
 
 	Mesh* FloorMesh = CreateAndRegisterMesh<Mesh>("FloorMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
@@ -98,7 +98,6 @@ void Scene::LoadContent()
 	Leftwall->Static = true;
 	TopWall->Static = true;
 	BottomWall->Static = true;
-
 
 	//for (int i = 0; i < 10; ++i)
 	//{
@@ -260,6 +259,7 @@ void Scene::LoadContent()
 	//RootMesh->AddChild.push_back(FloorMesh);
 
 	ecs_manager.Setup();
+	ecs_manager.SystemSetup();
 }
 
 void Scene::UnloadContent()
@@ -288,6 +288,8 @@ void Scene::Init()
 	std::cout << "Initializing Scene" << std::endl;
 	collision_manager = new CollisionManager();
 	camera = new Camera();
+	camera->cameraPos.y = 50;
+	camera->CameraSpeed = 100;
 }
 
 void Scene::Update(float DeltaTime)
@@ -536,26 +538,31 @@ void Scene::FramebufferSizeCallback(Window* window, int width, int height)
 void Scene::MouseMoveCallback(Window* window, double xpos, double ypos)
 {
     camera->MouseMoveCallback(window->GetGLFWWindow(), xpos, ypos);
+	ecs_manager.MouseMoveCallback(window, xpos, ypos);
 }
 
 void Scene::MouseButtonCallback(Window* window, int button, int action, int mods)
 {
 	camera->MouseButtonCallback(window->GetGLFWWindow(), button, action, mods);
+	ecs_manager.MouseButtonCallback(window, button, action, mods);
 }
 
 void Scene::MouseScrollCallback(Window* window, double xoffset, double yoffset)
 {
 	camera->MouseScrollCallback(window->GetGLFWWindow(), xoffset, yoffset);
+	ecs_manager.MouseScrollCallback(window, xoffset, yoffset);
 }
 
 void Scene::KeyCallback(Window* window, int key, int scancode, int action, int mods)
 {
 	camera->KeyCallback(window->GetGLFWWindow(), key, scancode, action, mods);
+	ecs_manager.KeyCallback(window, key, scancode, action, mods);
 }
 
 void Scene::ProcessInput(Window* window, float DeltaTime)
 {
 	camera->ProcessInput(window->GetGLFWWindow(), DeltaTime);
+	ecs_manager.ProcessInput(window, DeltaTime);
 }
 
 void Scene::StartTimer(std::string TimerName)

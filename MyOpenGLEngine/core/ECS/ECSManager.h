@@ -1,53 +1,46 @@
 #pragma once
-#include <iostream>
+
 #include <vector>
-#include <unordered_map>
-#include <string>
-
 #include "Entity.h"
-#include "ComponentHandler/ComponentHandler.h"
-#include "ComponentHandler/HandlerInterface.h"
 
-//Systems
-#include "Systems/CombatSystem.h"
-#include "Systems/MovementSystem.h"
-#include "Systems/MeshSystem.h"
+#include "Systems/SystemBase.h"
+
+// Extra
+#include "MeshBase.h"
+#include "Window.h"
 
 class ECSManager {
 
 public:
 
 	ECSManager();
-	void Setup();
 
-	void CreateEnemy();
+	void Setup();
+	void SystemSetup();
 
 	void Update(float DeltaTime);
 	void Render();
 
-	void RemoveEntity(Entity& entity);
-	Entity& CreateEntity();
+	void CreateEnemy(glm::vec3 Position);
 
-	std::vector<Entity> Entities;
-
-	template <typename T, typename... Args >
-	void AddComponent(Entity& entity, Args&&... args);
-
-	// Returns the entire map of components
-	const std::unordered_map<std::string, HandlerInterface*>& GetComponentMap();
-
-	// Returns a specific componentHandler
-	template <typename T>
-	ComponentHandler<T>* GetComponentHandler();
+	void DeleteEntity(Entity* entity);
+	MeshBase* BoxMesh;
 
 
-	//Systems
-	MovementSystem Movement_System;
-	MeshSystem Mesh_System;
-	CombatSystem combat_system;
+	void MouseMoveCallback(Window* window, double xpos, double ypos);
+	void MouseButtonCallback(Window* window, int button, int action, int mods);
+	void MouseScrollCallback(Window* window, double xoffset, double yoffset);
+	void KeyCallback(Window* window, int key, int scancode, int action, int mods);
+
+	void ProcessInput(Window* window, float DeltaTime);
+
+	std::vector<Entity*> Entities;
+
+	std::vector<Entity*> EntitiesToDelete;
+
 private:
-	// Map of all componentHandlers
-	std::unordered_map<std::string, HandlerInterface*> ComponentHandlers;
+	Entity* CreateEntity();
+	std::vector<SystemBase*> Systems;
 };
 
 

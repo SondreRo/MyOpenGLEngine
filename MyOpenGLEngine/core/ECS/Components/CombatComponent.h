@@ -1,15 +1,21 @@
 #pragma once
 #include "ComponentBase.h"
+#include "Entity.h"
 
-class CombatComponent : public ComponentBase {
+class CombatComponent : public ComponentBase
+{
 public:
 	CombatComponent() = default;
-	CombatComponent(int inDamage) {
-		damage = inDamage;
+	CombatComponent(int health, int damage, Entity* target)
+	{
+		Health = health;
+		Damage = damage;
+		Target = target;
+		MaxHealth = health;
 	}
 
-	int damage = 10;
-	float StandardRange = 2.f;
-
-	float ArealRange = 25.f;
+	int Health = 100;
+	int MaxHealth = 100;
+	int Damage = 10;
+	Entity* Target = nullptr;
 };

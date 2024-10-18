@@ -1,18 +1,35 @@
 #pragma once
-#include <vector>
 
-#include "systembase.h"
-#include "../ComponentHandler/ComponentHandler.h"
-#include "../Components/MovementComponent.h"
+#include "SystemBase.h"
+
+// Components
 #include "../Components/TransformComponent.h"
-#include "ECS/Entity.h"
+#include "../Components/VelocityComponent.h"
 
-class MovementSystem : public SystemBase{
+#include <iostream>
+
+class MovementSystem : public SystemBase
+{
 public:
+	virtual void Setup(Entity* entity, ECSManager* manager) override
+	{
+		SystemBase::Setup(entity, manager);
+	}
 
-	ComponentHandler<MovementComponent>* MovementHandler;
-	ComponentHandler<TransformComponent>* TransformHandler;
+	virtual void Update(Entity* entity, float DeltaTime) override
+	{
+		if (TransformComponent* TC = entity->GetComponent<TransformComponent>())
+		{
+			if (VelocityComponent* VC = entity->GetComponent<VelocityComponent>())
+			{
+				TC->transform.AddLocation(VC->Velocity * DeltaTime);
+				VC->Velocity *= 1 - (3 * DeltaTime);
+			}
+		}
+	}
 
-	void MoveEntity(Entity entity, float DeltaTime);
+	virtual void Render(Entity* entity) override
+	{
 
+	}
 };
