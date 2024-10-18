@@ -90,6 +90,13 @@ void ECSManager::Update(float DeltaTime)
 		for (auto entity : EntitiesToDelete)
 		{
 			if (!entity) continue;
+
+			if (InputComponent* IC = entity->GetComponent<InputComponent>())
+			{
+				std::cout << "Player died" << std::endl;
+				std::cout << "Quitting Game" << std::endl;
+			}
+
 			Entities.erase(std::remove(Entities.begin(), Entities.end(), entity), Entities.end());
 			delete entity;
 			CreateEnemy(glm::vec3(rand() % 100 - 50, 1, (rand() % 100 - 50)));

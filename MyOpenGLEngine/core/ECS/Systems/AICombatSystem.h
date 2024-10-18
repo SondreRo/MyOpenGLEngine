@@ -8,6 +8,7 @@
 
 
 #include "ECSManager.h"
+#include <chrono>
 
 class AICombatSystem : public SystemBase
 {
@@ -112,6 +113,18 @@ public:
 		{
 			if (TransformComponent* TC = entity->GetComponent<TransformComponent>())
 			{
+
+				auto now = std::chrono::system_clock::now();
+
+				// Check if 2 seconds have passed since the last hit
+				if (now < CC->TimerLastHit + std::chrono::seconds(1)) {
+					//std::cout << "Too soon!" << std::endl;
+					return;
+				}
+
+				// Store the current time for future comparisons
+				CC->TimerLastHit = now;  // Store time as time_point instead of float
+
 				//std::cout << "Entity took damage" << std::endl;
 				float Percentage = (float)CC->Health / (float)CC->MaxHealth;
 				TC->transform.SetScale(glm::vec3(Percentage));

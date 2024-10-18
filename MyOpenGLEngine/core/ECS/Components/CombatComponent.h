@@ -1,4 +1,6 @@
 #pragma once
+#include <chrono>
+
 #include "ComponentBase.h"
 #include "Entity.h"
 
@@ -18,4 +20,6 @@ public:
 	int MaxHealth = 100;
 	int Damage = 10;
 	Entity* Target = nullptr;
+
+	std::chrono::system_clock::time_point TimerLastHit;
 };
