@@ -27,6 +27,7 @@ int ShaderProgram::ReadShaderFile(const std::string& VertexPath, const std::stri
 	else
 	{
 		std::cout << "Could not open file"  << std::endl;
+		return 0;
 	}
 	std::stringstream FragmentStream;
 
@@ -35,6 +36,11 @@ int ShaderProgram::ReadShaderFile(const std::string& VertexPath, const std::stri
 		FragmentStream << ShaderFragmentFile.rdbuf();
 		ShaderFragmentFile.close();
 		fragmentCode = FragmentStream.str();
+	}
+	else
+	{
+		std::cout << "Could not open file" << std::endl;
+		return 0;
 	}
 
 	return 1;

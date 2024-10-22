@@ -1,17 +1,21 @@
 #include "Scene.h"
 
-#include <iostream>
-#include <glad/glad.h>
+#include "actor.h"
 #include "Application.h"
 #include "Ball.h"
-#include "imgui.h"
-#include "Vertex.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "MeshGenerator.h"
+#include "imgui.h"
 #include "Material.h"
-#include <queue>
+#include "MeshGenerator.h"
+#include "PunktSky/PunktSky.h"
+#include "Vertex.h"
 #include <chrono>
-#include "actor.h"
+#include <glad/glad.h>
+#include <iostream>
+#include <queue>
+
+#include "BSpline/BSplineSurface.h"
+
 
 Scene::Scene(const std::string& name)
 {
@@ -26,11 +30,21 @@ void Scene::LoadContent()
 	
 
 
+
 	ShaderProgram* shaderProgram = new ShaderProgram();
-	shaderProgram->ReadShaderFile("../../../core/shaders/VertexShader.vert", "../../../core/shaders/FragmentShader.frag");
+	
+	if (shaderProgram->ReadShaderFile("../../../core/shaders/VertexShader.vert", "../../../core/shaders/FragmentShader.frag") == 0)
+	{
+		shaderProgram->ReadShaderFile("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
+	}
 
 	ShaderProgram* lineShaderProgram = new ShaderProgram();
-	lineShaderProgram->ReadShaderFile("../../../core/shaders/lineShaders/LineVertexShader.vert", "../../../core/shaders/lineShaders/LineFragmentShader.frag");
+	if (lineShaderProgram->ReadShaderFile("../../../core/shaders/lineShaders/LineVertexShader.vert", "../../../core/shaders/lineShaders/LineFragmentShader.frag") == 0)
+	{
+		lineShaderProgram->ReadShaderFile("shaders/lineShaders/LineVertexShader.vert", "shaders/lineShaders/LineFragmentShader.frag");
+	
+
+	}
 
 	//shaderProgram->ReadShaderFile("D:/OpenGL/MyEngine/MyOpenGLEngine/core/shaders/VertexShader.vert", "D:/OpenGL/MyEngine/MyOpenGLEngine/core/shaders/FragmentShader.frag");
 	shaderProgram->CompileShaders();
@@ -99,6 +113,79 @@ void Scene::LoadContent()
 	TopWall->Static = true;
 	BottomWall->Static = true;
 
+
+
+	Mesh* Landscape = CreateAndRegisterMesh<Mesh>("Landscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
+	FloorMesh->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
+	FloorMesh->material.shininess = 8.f;
+
+	//std::filesystem::path path = "../../../core/pointCloud.txt";
+	std::filesystem::path path = "../../../core/vsim_las.txt";
+	punktSky.ReadFile(path);
+	Landscape->vertices = punktSky.vertices;
+	Landscape->renderDots = true;
+	Landscape->NormalAsColor = true;
+
+
+	// -------------------  BSPLINE SURFACE ------------------- //
+	Mesh* BSplineMesh = CreateAndRegisterMesh<Mesh>("BSplineMesh", glm::vec3(0.f, 5.f, 0.f), glm::vec3(0,180,0), glm::vec3(1.f), shaderProgram, nullptr, true);
+	Mesh* BSplineControlMesh = CreateAndRegisterMesh<Mesh>("BSplineControlMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, BSplineMesh, true);
+	BSplineControlMesh->renderDots = true;
+	std::vector<std::vector<glm::vec3>> controlPoints = {
+	   { glm::vec3(0, 0, 0), glm::vec3(1, 0, 1), glm::vec3(2, 0, 0) },
+	   { glm::vec3(0, 1, 1), glm::vec3(1, 1, 2), glm::vec3(2, 1, 1) },
+	   { glm::vec3(0, 2, 0), glm::vec3(1, 2, 1), glm::vec3(2, 2, 0) }
+	};
+
+	//std::vector<std::vector<glm::vec3>> controlPoints = {
+	//{ glm::vec3(0, 0, 0), glm::vec3(1, 0, 0), glm::vec3(2, 0, 0), glm::vec3(3, 0, 0) },
+	//{ glm::vec3(0, 1, 0), glm::vec3(1, 1, 2), glm::vec3(2, 1, 2), glm::vec3(3, 1, 0) },
+	//{ glm::vec3(0, 2, 0), glm::vec3(1, 2, 0), glm::vec3(2, 2, 0), glm::vec3(3, 2, 0) }
+	//};
+
+	//std::vector<std::vector<glm::vec3>> controlPoints = {
+	//{ glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 3.0f, 3.0f), glm::vec3(3.0f, 0.0f, 1.0f) },
+	//{ glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(2.0f, 3.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f) },
+	//{ glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(2.0f, 2.0f, 0.0f), glm::vec3(3.0f, 2.0f, 1.0f) }
+	//};
+
+
+	for (auto& control_point : controlPoints)
+	{
+		for (auto& point : control_point)
+		{
+			point *= 10.f;
+		}
+	}
+
+
+	for (auto & row : controlPoints)
+	{
+		for (auto& point : row)
+		{
+			BSplineControlMesh->vertices.emplace_back(point);
+		}
+	}
+
+
+	int resolutionU = 10;  // Resolution along the u direction
+	int resolutionV = 10;  // Resolution along the v direction
+
+	// Generate vertices for the B-spline surface
+	std::vector<glm::vec3> vertices = BSplineSurface::generateBSplineMesh(controlPoints, resolutionU, resolutionV);
+
+	// Generate the triangle indices for the surface
+	std::vector<unsigned int> indices = BSplineSurface::triangulate(resolutionU, resolutionV);
+
+	for (auto& vertex : vertices)
+	{
+		BSplineMesh->vertices.emplace_back(vertex);
+	}
+
+	BSplineMesh->indices = indices;
+
+	MeshGenerator::GenerateNormals(BSplineMesh);
+	
 	//for (int i = 0; i < 10; ++i)
 	//{
 
@@ -258,8 +345,8 @@ void Scene::LoadContent()
 
 	//RootMesh->AddChild.push_back(FloorMesh);
 
-	ecs_manager.Setup();
-	ecs_manager.SystemSetup();
+	//ecs_manager.Setup();
+	//ecs_manager.SystemSetup();
 }
 
 void Scene::UnloadContent()
@@ -301,7 +388,7 @@ void Scene::Update(float DeltaTime)
 	//std::cout << "Updating Scene" << std::endl;
 	UpdateSceneGraph(DeltaTime, RootMesh, glm::mat4(1));
 	collision_manager->Update(DeltaTime);
-	ecs_manager.Update(DeltaTime);
+	//ecs_manager.Update(DeltaTime);
 		//end timer
 	//EndTimer("Update");
 }
@@ -332,10 +419,12 @@ void Scene::Render(float DeltaTime, int width, int height)
 	// SceneGraph
 	RenderSceneGraph(RootMesh, DeltaTime, width, height, glm::mat4(1));
 	RenderSceneGraphVisuals();
-	collision_manager->Render(lineMesh);
+	//collision_manager->Render(lineMesh);
 	//lineMesh->AddLine(glm::vec3(0, 0, 0), glm::vec3(10, 5, 2));
 
-	ecs_manager.Render();
+	//ecs_manager.Render();
+	//punktSky.Draw();
+
 
 	ImGui::Begin("Mesh Properties");
 	if (SelectedMesh != nullptr)
@@ -432,7 +521,7 @@ void Scene::ReadyRenderData(ShaderProgram* shader, Mesh* mesh, glm::mat4 parentT
 	//std::cout << "Ready Render Data" << std::endl;
 	// Camera stuff
 	float Aspect = (float)width / (float)height;
-	glm::mat4 projection = glm::perspective(glm::radians(90.f), Aspect, 0.1f, 300.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(90.f), Aspect, 0.1f, 30000.0f);
 	glUniformMatrix4fv(glGetUniformLocation(shader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(shader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
 

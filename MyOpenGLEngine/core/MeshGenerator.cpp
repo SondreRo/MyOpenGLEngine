@@ -10,6 +10,22 @@ glm::vec3 MeshGenerator::GetNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 		return -(glm::normalize(glm::cross(A, B)));
 }
 
+void MeshGenerator::GenerateNormals(Mesh* inMesh)
+{
+	for (int i = 0; i < inMesh->indices.size(); i += 3)
+	{
+		Vertex ver1 = inMesh->vertices[inMesh->indices[i]];
+		Vertex ver2 = inMesh->vertices[inMesh->indices[i + 1]];
+		Vertex ver3 = inMesh->vertices[inMesh->indices[i + 2]];
+
+		glm::vec3 Normal = GetNormal(ver1.position, ver2.position, ver3.position);
+
+		inMesh->vertices[inMesh->indices[i]].normal = -Normal;
+		inMesh->vertices[inMesh->indices[i + 1]].normal = -Normal;
+		inMesh->vertices[inMesh->indices[i + 2]].normal = -Normal;
+	}
+}
+
 void MeshGenerator::GenerateCube(Mesh* inMesh, glm::vec3 Size)
 {
 	glm::vec3 v1 = { -0.5f * Size.x, -0.5f * Size.y, -0.5f * Size.z };

@@ -15,7 +15,7 @@ public:
 	};
 
 	static glm::vec3 GetNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
-
+	static void GenerateNormals(Mesh* inMesh);
 
 	static void GenerateCube(Mesh* inMesh, glm::vec3 Size);
 	static void GenerateCubeWithHardEdges(Mesh* inMesh, glm::vec3 Size);

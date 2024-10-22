@@ -19,15 +19,35 @@ Mesh::~Mesh()
 
 void Mesh::Draw()
 {
+
+	if (NormalAsColor)
+	{
+		shaderProgram->SetUniform1i("useColorNormal", 1);
+	}
+	else {
+		shaderProgram->SetUniform1i("useColorNormal", 0);
+	}
+
 	glBindVertexArray(VAO);
 
-	if (indices.size() > 0)
+	unsigned int RenderMode;
+	if (renderDots)
 	{
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		RenderMode = GL_POINTS;
+		glPointSize(DotsSize);
 	}
 	else
 	{
-		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		RenderMode = GL_TRIANGLES;
+	}
+
+	if (indices.size() > 0)
+	{
+		glDrawElements(RenderMode, indices.size(), GL_UNSIGNED_INT, 0);
+	}
+	else
+	{
+		glDrawArrays(RenderMode, 0, vertices.size());
 	}
 }
 
@@ -99,6 +119,14 @@ void Mesh::RenderProperties()
 
 
 	ImGui::Checkbox("UseCollision", &UseCollision);
+
+	ImGui::Checkbox("Render Dots", &renderDots);
+	if (renderDots)
+	{
+		ImGui::SliderFloat("Dot Size", &DotsSize, 0.1f, 10.0f);
+	}
+
+	ImGui::Checkbox("Normal As Color", &NormalAsColor);
 }
 
 AxisAlignedBoundingBox Mesh::GetAABB()

@@ -20,6 +20,10 @@ glm::mat4 Camera::GetViewMatrix()
 void Camera::ProcessInput(GLFWwindow* window, float deltaTime)
 {
 	float AdjustedCameraSpeed = CameraSpeed * deltaTime;
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		AdjustedCameraSpeed *= 2;
+
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * AdjustedCameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
@@ -34,6 +38,40 @@ void Camera::ProcessInput(GLFWwindow* window, float deltaTime)
 		cameraPos -= glm::normalize(cameraUp) * AdjustedCameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		cameraPos += glm::normalize(cameraUp) * AdjustedCameraSpeed;
+
+
+	float speed = 100.0f * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		pitch += speed;
+
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		pitch -= speed;
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		yaw -= speed;
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		yaw += speed;
+
+
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(direction);
+
+	if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
+		CameraSpeed += 100.f * deltaTime;
+
+	if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
+		if (CameraSpeed > 0.2f)
+			CameraSpeed -= 100.f * deltaTime;
+
 }
 
 void Camera::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
