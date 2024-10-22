@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include "mesh.h"
+#include "MeshBase.h"
 #include <array>
 class MeshGenerator {
 public:
@@ -14,10 +15,11 @@ public:
 	};
 
 	static glm::vec3 GetNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
-
+	static void GenerateNormals(Mesh* inMesh);
 
 	static void GenerateCube(Mesh* inMesh, glm::vec3 Size);
 	static void GenerateCubeWithHardEdges(Mesh* inMesh, glm::vec3 Size);
+	static void GenerateCubeWithHardEdges(MeshBase* inMesh, glm::vec3 Size);
 
 	static void GenerateSphere(Mesh* inMesh, float Radius, int Sectors, int Stacks);
 	static void GenerateIcosahedron(Mesh* inMesh, int n);
@@ -27,5 +29,6 @@ public:
 	static void ToUnitSphere(Mesh* inMesh);
 	static void Subdivide(Vertex a, Vertex b, Vertex c, int n, Mesh* inMesh);
 
-	static std::vector<glm::vec3> GetMeshCorners(Mesh* inMesh);
+	static void GetMeshCorners(Mesh* inMesh);
+	static void GetMeshCorners(MeshBase* inMesh);
 };

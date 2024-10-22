@@ -17,6 +17,7 @@ uniform float shininess;
 
 uniform vec3 lightDirection;
 
+uniform int useColorNormal = 0;
 
 struct DirectionalLight
 {
@@ -82,6 +83,15 @@ void main()
     // final color
     vec3 finalColor = ambientContribution + diffuseContribution + specularContribution;
 
-    FragColor = vec4(finalColor, 1);
+
+    if (useColorNormal == 1)
+    {
+        FragColor = vec4(FragPos, 1);
+        //FragColor = vec4(1, 0, 0, 1);
+    }
+    else
+    {
+	    FragColor = vec4(finalColor, 1);
+	}
     //FragColor = texture(ourTexture, TexCoord) * vec4(finalColor, 1);  
 }

@@ -1,5 +1,6 @@
 #pragma once
 
-class ComponentBase {
-
+class ComponentBase
+{
+public:
 };

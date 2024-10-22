@@ -7,7 +7,7 @@
 
 struct Material {
 
-    void BindMaterial(ShaderProgram& shader);
+    void BindMaterial(ShaderProgram* shader);
 
 
     glm::vec3 diffuse = glm::vec3(0.6f, 0.6f, 0.6f);

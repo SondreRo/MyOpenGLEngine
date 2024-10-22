@@ -29,11 +29,14 @@ public:
 	// Render Data
 	Material material;
 	ShaderProgram* shaderProgram;
+	bool renderDots = false;
+	float DotsSize = 1.0f;
+	bool NormalAsColor = false;
 
 	// Transform Data
 	Transform transform;
 	glm::mat4 ParentMatrix = glm::mat4(1);
-	glm::mat4 Transformmat = glm::mat4(1);;
+	glm::mat4 Transformmat = glm::mat4(1);
 	glm::mat4 GetTransformMat();
 
 
