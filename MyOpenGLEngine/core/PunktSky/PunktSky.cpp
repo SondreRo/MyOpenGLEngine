@@ -32,12 +32,25 @@ void PunktSky::ReadFile(std::filesystem::path path)
 
 
 	//// Read the file line by line
-
+	int Line = 0;
 	while (std::getline(file, line))
 	{
+		Line++;
+
+		if (Line % 100000 == 0)
+		{
+			std::cout << "Reading line: " << Line << "\n";
+		}
+
+		if ((Line & 2) == 0)
+		{
+			continue;
+		}
+
 		Vertex vertex;
 		std::stringstream ss(line);
-		ss >> vertex.position.x >> vertex.position.z >> vertex.position.y;
+		//ss >> vertex.position.x >> vertex.position.z >> vertex.position.y;
+		ss >> vertex.position.x >> vertex.position.z >> vertex.position.y >> vertex.normal.x >> vertex.normal.y >> vertex.normal.z;
 
 
 		min = glm::min(min, vertex.position);
@@ -179,8 +192,8 @@ void PunktSky::ReadFile(std::filesystem::path path)
 		// Create vector for blue to red
 		glm::vec3 color = glm::mix(glm::vec3(0, 0, 1), glm::vec3(1, 0, 0), percentage);
 
-		vertex.normal = vertex.position;
-		vertex.normal = glm::vec3(0, 1, 0);
+		//vertex.normal = vertex.position;
+		//vertex.normal = glm::vec3(0, 1, 0);
 		//std::cout << color.x << " " << color.y << " " << color.z << "\n";
 
 	}

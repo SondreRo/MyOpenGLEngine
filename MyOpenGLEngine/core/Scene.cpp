@@ -120,7 +120,8 @@ void Scene::LoadContent()
 	FloorMesh->material.shininess = 8.f;
 
 	//std::filesystem::path path = "../../../core/pointCloud.txt";
-	std::filesystem::path path = "../../../core/vsim_las.txt";
+	//std::filesystem::path path = "../../../core/vsim_las.txt";
+	std::filesystem::path path = "C:/Users/soroe/Downloads/eksport_975985_20241023/CroppedCloud.txt";
 	punktSky.ReadFile(path);
 	Landscape->vertices = punktSky.vertices;
 	Landscape->renderDots = true;

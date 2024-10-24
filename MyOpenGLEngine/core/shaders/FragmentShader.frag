@@ -86,7 +86,8 @@ void main()
 
     if (useColorNormal == 1)
     {
-        FragColor = vec4(FragPos, 1);
+        //FragColor = vec4(FragPos, 1);
+        FragColor = vec4(Normal, 1);
         //FragColor = vec4(1, 0, 0, 1);
     }
     else
