@@ -5,7 +5,7 @@
 // Components
 #include "../Components/TransformComponent.h"
 #include "../Components/VelocityComponent.h"
-
+#include "../Components/InputComponent.h"
 #include <iostream>
 
 class MovementSystem : public SystemBase

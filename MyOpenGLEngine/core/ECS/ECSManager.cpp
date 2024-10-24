@@ -6,11 +6,13 @@
 #include "Components/MeshComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/PickupComponent.h"
 
 // Systems
 #include "Systems/MovementSystem.h"
 #include "Systems/RenderSystem.h"
 #include "Systems/AICombatSystem.h"
+#include "Systems/PickupSystem.h"
 
 // Extra
 #include "Application.h"
@@ -28,6 +30,7 @@ ECSManager::ECSManager()
 
 void ECSManager::Setup()
 {
+	srand(time(nullptr));
 	ShaderProgram* newShader = Application::get().mScene.Shaders["DefaultShader"];
 	BoxMesh->shaderProgram = newShader;
 	BoxMesh->material.diffuse = glm::vec3(1, 0, 0);
@@ -38,6 +41,12 @@ void ECSManager::Setup()
 	PlayerMesh->shaderProgram = newShader;
 	PlayerMesh->material.diffuse = glm::vec3(0, 0, 1);
 
+	MeshBase* PickupMesh = new MeshBase();
+	MeshGenerator::GenerateCubeWithHardEdges(PickupMesh, glm::vec3(3.f));
+	PickupMesh->shaderProgram = newShader;
+	PickupMesh->material.diffuse = glm::vec3(1, 1, 1);
+
+
 	// Create Entities
 	Entity* Player = CreateEntity();
 	Player->AddComponent<TransformComponent>(new TransformComponent(glm::vec3(0, 1, -50)));
@@ -46,6 +55,19 @@ void ECSManager::Setup()
 	Player->AddComponent<InputComponent>(new InputComponent());
 	Player->AddComponent<CombatComponent>(new CombatComponent(100, 10, nullptr));
 
+
+	for (int i = 0; i < 6; i++)
+	{
+		Entity* E1 = CreateEntity();
+		//Random float from -5 to 5
+		float RandVelX = (rand() % 10 - 5) / 10.f;
+		float RandVelZ = (rand() % 10 - 5) / 10.f;
+
+		E1->AddComponent<TransformComponent>(new TransformComponent(glm::vec3(RandVelX * 100, 1, RandVelZ * 100)));
+		E1->AddComponent<PickupComponent>(new PickupComponent());
+		E1->AddComponent<MeshComponent>(new MeshComponent(PickupMesh));
+
+	}
 
 
 	for (int i = 0; i < 1000; i++)
@@ -64,7 +86,7 @@ void ECSManager::SystemSetup()
 	Systems.emplace_back(new MovementSystem());
 	Systems.emplace_back(new RenderSystem());
 	Systems.emplace_back(new AICombatSystem());
-
+	Systems.emplace_back(new PickupSystem());
 
 	for (auto& system : Systems)
 	{
@@ -89,6 +111,8 @@ void ECSManager::Update(float DeltaTime)
 	{
 		for (auto entity : EntitiesToDelete)
 		{
+			bool isEnemy = entity->GetComponent<CombatComponent>();
+
 			if (!entity) continue;
 
 			if (InputComponent* IC = entity->GetComponent<InputComponent>())
@@ -99,7 +123,11 @@ void ECSManager::Update(float DeltaTime)
 
 			Entities.erase(std::remove(Entities.begin(), Entities.end(), entity), Entities.end());
 			delete entity;
-			CreateEnemy(glm::vec3(rand() % 100 - 50, 1, (rand() % 100 - 50)));
+
+			if (isEnemy)
+			{
+				CreateEnemy(glm::vec3(rand() % 100 - 50, 1, (rand() % 100 - 50)));
+			}
 		}
 		EntitiesToDelete.clear();
 
@@ -185,6 +213,9 @@ void ECSManager::ProcessInput(Window* window, float DeltaTime)
 		{
 			if (VelocityComponent* VC = entity->GetComponent<VelocityComponent>())
 			{
+				Speed *= IC->Speed;
+
+
 				if (glfwGetKey(window->GetGLFWWindow(), GLFW_KEY_UP) == GLFW_PRESS)
 					VC->Velocity.z -= Speed * DeltaTime;
 

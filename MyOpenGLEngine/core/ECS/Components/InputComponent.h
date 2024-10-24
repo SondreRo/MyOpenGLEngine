@@ -11,6 +11,6 @@ public:
 	{
 		IsPlayer = isPlayer;
 	}
-
+	float Speed = 1.0f;
 	bool IsPlayer = false;
 };
