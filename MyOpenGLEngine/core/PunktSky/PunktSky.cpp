@@ -42,10 +42,10 @@ void PunktSky::ReadFile(std::filesystem::path path)
 			std::cout << "Reading line: " << Line << "\n";
 		}
 
-		if ((Line & 2) == 0)
-		{
-			continue;
-		}
+		//if ((Line & 2) == 0)
+		//{
+		//	continue;
+		//}
 
 		Vertex vertex;
 		std::stringstream ss(line);
