@@ -30,11 +30,11 @@ ECSManager::ECSManager()
 
 void ECSManager::Setup()
 {
+	// TODO FIX LATER
 	srand(time(nullptr));
 	ShaderProgram* newShader = Application::get().mScene.Shaders["DefaultShader"];
 	BoxMesh->shaderProgram = newShader;
 	BoxMesh->material.diffuse = glm::vec3(1, 0, 0);
-
 
 	MeshBase* PlayerMesh = new MeshBase();
 	MeshGenerator::GenerateCubeWithHardEdges(PlayerMesh, glm::vec3(2.f));
@@ -45,6 +45,9 @@ void ECSManager::Setup()
 	MeshGenerator::GenerateCubeWithHardEdges(PickupMesh, glm::vec3(3.f));
 	PickupMesh->shaderProgram = newShader;
 	PickupMesh->material.diffuse = glm::vec3(1, 1, 1);
+	// TODO FIX LATER
+
+
 
 
 	// Create Entities
@@ -55,7 +58,7 @@ void ECSManager::Setup()
 	Player->AddComponent<InputComponent>(new InputComponent());
 	Player->AddComponent<CombatComponent>(new CombatComponent(100, 10, nullptr));
 
-
+	// Create Pickups
 	for (int i = 0; i < 6; i++)
 	{
 		Entity* E1 = CreateEntity();
@@ -69,16 +72,12 @@ void ECSManager::Setup()
 
 	}
 
-
+	// Create Enemies
 	for (int i = 0; i < 1000; i++)
 	{
 		CreateEnemy(glm::vec3(rand() % 100 - 50, 1, (rand() % 100 - 50) + 50));
 		
 	}
-  
-
-
-
 }
 
 void ECSManager::SystemSetup()
