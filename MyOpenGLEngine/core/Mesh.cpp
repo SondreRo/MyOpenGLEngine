@@ -20,6 +20,11 @@ Mesh::~Mesh()
 void Mesh::Draw()
 {
 
+	if (isBound == false)
+	{
+		Bind();
+	}
+
 	if (NormalAsColor)
 	{
 		shaderProgram->SetUniform1i("useColorNormal", 1);
@@ -55,10 +60,36 @@ void Mesh::Update(float DeltaTime)
 {
 	Transformmat = transform.GetMatrix();
 	UpdateAABB();
+
+	//bool NewVerts = false;
+
+	if (ReadingFirst)
+	{
+		while (!incomming_vertices.empty())
+		{
+			vertices.push_back(incomming_vertices.front());
+			incomming_vertices.pop();
+		}
+	}
+	else
+	{
+		
+		while (!incomming_vertices2.empty())
+		{
+			vertices.push_back(incomming_vertices2.front());
+			incomming_vertices2.pop();
+		}
+	}
 }
 
 void Mesh::Bind()
 {
+
+	//if (HasBoundOnce)
+	//{
+	//	Unbind();
+	//}
+
 	// VAO
 	glGenBuffers(1, &VBO);
 
@@ -69,14 +100,40 @@ void Mesh::Bind()
 	// VBO
 	glGenBuffers(1, &EBO);
 
+	unsigned int BindMode = GL_STATIC_DRAW;
+
+	if (BindDynamic)
+	{
+		BindMode = GL_DYNAMIC_DRAW;
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), BindMode);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), BindMode);
    
 	Vertex::BindAttributes();
+
+	isBound = true;
+	HasBoundOnce = true;
+}
+
+void Mesh::Rebind()
+{
+
+	unsigned int BindMode = GL_STATIC_DRAW;
+
+	if (BindDynamic)
+	{
+		BindMode = GL_DYNAMIC_DRAW;
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), BindMode);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), BindMode);
 }
 
 void Mesh::Unbind()

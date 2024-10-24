@@ -122,10 +122,10 @@ void Scene::LoadContent()
 	//std::filesystem::path path = "../../../core/pointCloud.txt";
 	//std::filesystem::path path = "../../../core/vsim_las.txt";
 	std::filesystem::path path = "C:/Users/soroe/Downloads/eksport_975985_20241023/CroppedCloud.txt";
-	punktSky.ReadFile(path);
-	Landscape->vertices = punktSky.vertices;
-	Landscape->renderDots = true;
-	Landscape->NormalAsColor = true;
+	punktSky.ReadFile(path, Landscape);
+	//Landscape->vertices = punktSky.vertices;
+	//Landscape->renderDots = true;
+	//Landscape->NormalAsColor = true;
 
 
 	// -------------------  BSPLINE SURFACE ------------------- //
@@ -382,6 +382,15 @@ void Scene::Init()
 
 void Scene::Update(float DeltaTime)
 {
+
+	while (MeshQueue.size() > 0)
+	{
+		Mesh* mesh = MeshQueue.front();
+		mesh->Bind();
+		Meshes[mesh->name] = mesh;
+		MeshQueue.pop();
+	}
+
 	//start timer
 	//StartTimer("Update");
 

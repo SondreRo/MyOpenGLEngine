@@ -66,6 +66,8 @@ public:
 	std::unordered_map<std::string, ShaderProgram*> Shaders;
 
 
+	std::queue<Mesh*> MeshQueue;
+
 	// Callbacks for window events
 	void FramebufferSizeCallback(Window* window, int width, int height);
 	void MouseMoveCallback(Window* window, double xpos, double ypos);

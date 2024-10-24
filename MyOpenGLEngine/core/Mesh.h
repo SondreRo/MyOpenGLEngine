@@ -6,6 +6,8 @@
 #include "Transform.h"
 #include "Material.h"
 #include "Collision/Colliders.h"
+#include <queue>
+
 
 class Mesh {
 public:
@@ -17,6 +19,7 @@ public:
 	virtual void Draw();
 	virtual void Update(float DeltaTime);
 	virtual void Bind();
+	virtual void Rebind();
 	virtual void Unbind();
 
 	virtual void RenderProperties();
@@ -26,12 +29,20 @@ public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 
+	bool ReadingFirst = true;
+	std::queue<Vertex> incomming_vertices;
+	std::queue<Vertex> incomming_vertices2;
+
+
 	// Render Data
 	Material material;
 	ShaderProgram* shaderProgram;
 	bool renderDots = false;
 	float DotsSize = 1.0f;
 	bool NormalAsColor = false;
+	bool isBound = false;
+	bool BindDynamic = false;
+	bool HasBoundOnce = false;
 
 	// Transform Data
 	Transform transform;

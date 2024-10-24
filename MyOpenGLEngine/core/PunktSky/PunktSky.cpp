@@ -3,61 +3,187 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "Application.h"
 
-
-void PunktSky::ReadFile(std::filesystem::path path)
+void PunktSky::ReadFileThreaded(std::filesystem::path path, Mesh* mesh)
 {
+	// Exit Early if file does not exist
 	if (!std::filesystem::exists(path))
 	{
 		std::cout << "File does not exist at: " << path << "\n";
 		return;
 	}
 
-	std::ifstream file(path); // Open file
-	//FILE* file = fopen("data.txt", "r");
+	glm::vec3 min = glm::vec3(FLT_MAX);
+	glm::vec3 max = glm::vec3(FLT_MIN);
 
+	std::ifstream file(path); // Open file
 	std::string line;
 
-	std::getline(file, line);
-	std::cout << "Reading file with: " << line << " lines\n";
 
-	glm::vec3 min(FLT_MAX), max(FLT_MIN);
-
-
-	//// Start timer
-	auto start = std::chrono::high_resolution_clock::now();
+	std::vector<Vertex> vertices;
 	vertices.reserve(1000000);
 
+	//mesh->transform.SetScale(glm::vec3(0.01f));
 
+	mesh->renderDots = true;
+	//mesh->vertices.reserve(1000000);
+	//mesh->BindDynamic = true;
 
+	glm::vec3 offsett = glm::vec3(0, 0, 0);
 
-	//// Read the file line by line
 	int Line = 0;
 	while (std::getline(file, line))
 	{
+		if (shouldClose)
+		{
+			return;
+		}
+
 		Line++;
+		//if (Line > 1000000)
+		//{
+		//	break;
+		//}
+
+	
 
 		if (Line % 100000 == 0)
 		{
 			std::cout << "Reading line: " << Line << "\n";
+			//mesh->isBound = false;
+
+			
+			if (mesh->ReadingFirst == true)
+			{
+				mesh->ReadingFirst = false;
+			}
+			else
+			{
+				mesh->ReadingFirst = true;
+			}
+			mesh->isBound = false;
 		}
-
-		//if ((Line & 2) == 0)
-		//{
-		//	continue;
-		//}
-
 		Vertex vertex;
 		std::stringstream ss(line);
-		//ss >> vertex.position.x >> vertex.position.z >> vertex.position.y;
 		ss >> vertex.position.x >> vertex.position.z >> vertex.position.y >> vertex.normal.x >> vertex.normal.y >> vertex.normal.z;
 
+		if (Line == 1)
+		{
+			offsett = vertex.position;
+		}
 
-		min = glm::min(min, vertex.position);
-		max = glm::max(max, vertex.position);
+		vertex.position -= offsett;
 
-		vertices.push_back(vertex);
+		//min = glm::min(min, vertex.position);
+		//max = glm::max(max, vertex.position);
+
+		if (mesh->ReadingFirst == true)
+		{
+			mesh->incomming_vertices2.push(vertex);
+		}
+		else
+		{
+			mesh->incomming_vertices.push(vertex);
+		}
+		//vertices.push_back(vertex);
 	}
+	if (shouldClose)
+	{
+		return;
+	}
+	std::cout << "Read File With: " << Line << " lines\n";
+
+	//glm::vec3 mid = (min + max) / 2.f;
+	//for (auto& vertex : mesh->vertices)
+	//{
+	//	vertex.position -= mid;
+	//}
+
+	mesh->isBound = false;
+	//for (auto& vertex : vertices)
+	//{
+	//	vertex.position -= mid;
+	//}
+
+	//mesh->transform.SetScale(glm::vec3(1));
+
+
+	//Mesh* newMesh = new Mesh("PunktSky");
+	//newMesh->vertices = vertices;
+	//newMesh->material = material;
+	//newMesh->shaderProgram = Application::get().mScene.Shaders["DefaultShader"];
+	//newMesh->Parent = Application::get().mScene.RootMesh;
+	//newMesh->Parent->Children.push_back(newMesh);
+	//newMesh->renderDots = true;
+
+	//Application::get().mScene.MeshQueue.push(newMesh);
+
+	std::cout << "Read " << vertices.size() << " vertices\n";
+}
+
+PunktSky::~PunktSky()
+{
+	shouldClose = true;
+}
+
+void PunktSky::ReadFile(std::filesystem::path path, Mesh* mesh)
+{
+	std::thread t1(&PunktSky::ReadFileThreaded, this, path, mesh);
+	t1.detach();
+	//t1.join();
+
+	//if (!std::filesystem::exists(path))
+	//{
+	//	std::cout << "File does not exist at: " << path << "\n";
+	//	return;
+	//}
+
+	//std::ifstream file(path); // Open file
+	////FILE* file = fopen("data.txt", "r");
+
+	//std::string line;
+
+	//std::getline(file, line);
+	//std::cout << "Reading file with: " << line << " lines\n";
+
+	//glm::vec3 min(FLT_MAX), max(FLT_MIN);
+
+
+	////// Start timer
+	//auto start = std::chrono::high_resolution_clock::now();
+	//vertices.reserve(1000000);
+
+
+
+
+	////// Read the file line by line
+	//int Line = 0;
+	//while (std::getline(file, line))
+	//{
+	//	Line++;
+
+	//	if (Line % 100000 == 0)
+	//	{
+	//		std::cout << "Reading line: " << Line << "\n";
+	//	}
+
+	//	//if ((Line & 2) == 0)
+	//	//{
+	//	//	continue;
+	//	//}
+
+	//	Vertex vertex;
+	//	std::stringstream ss(line);
+	//	//ss >> vertex.position.x >> vertex.position.z >> vertex.position.y;
+	//	ss >> vertex.position.x >> vertex.position.z >> vertex.position.y >> vertex.normal.x >> vertex.normal.y >> vertex.normal.z;
+
+
+	//	min = glm::min(min, vertex.position);
+	//	max = glm::max(max, vertex.position);
+
+	//	vertices.push_back(vertex);
+	//}
 
 
 	// Read using comma
@@ -160,46 +286,44 @@ void PunktSky::ReadFile(std::filesystem::path path)
 	//
 
 
+	
+	//t1.join();
+
+	//glm::vec3 mid = (min + max) / 2.f;
+
+	//while (!verticesQueue.empty())
+	//{
+	//	vertices.push_back(verticesQueue.front());
+	//	verticesQueue.pop();
+	//}
+
+	//float heighestPoint = max.y;
+	//float lowestPoint = min.y;
+
+	//srand(time(nullptr));
+
+	//for (auto& vertex : vertices)
+	//{
+	//	vertex.position -= mid;
+
+	//	float DiffDown = vertex.position.y - lowestPoint;
+
+	//	float New = DiffDown / (heighestPoint - lowestPoint);
+
+	//	float percentage = New/8;
+
+	//	vertex.position.x *= -1.f;
+	//	// Create vector for blue to red
+	//	glm::vec3 color = glm::mix(glm::vec3(0, 0, 1), glm::vec3(1, 0, 0), percentage);
+
+	//	//vertex.normal = vertex.position;
+	//	//vertex.normal = glm::vec3(0, 1, 0);
+	//	//std::cout << color.x << " " << color.y << " " << color.z << "\n";
+
+	//}
 
 
-
-	// End timer
-	auto end = std::chrono::high_resolution_clock::now();
-
-	// Print timer
-	std::chrono::duration<double> elapsed = end - start;
-	std::cout << "Reading file took: " << elapsed.count() << " seconds\n";
-
-	glm::vec3 mid = (min + max) / 2.f;
-
-
-	float heighestPoint = max.y;
-	float lowestPoint = min.y;
-
-	srand(time(nullptr));
-
-	for (auto& vertex : vertices)
-	{
-		vertex.position -= mid;
-
-		float DiffDown = vertex.position.y - lowestPoint;
-
-		float New = DiffDown / (heighestPoint - lowestPoint);
-
-		float percentage = New/8;
-
-
-		// Create vector for blue to red
-		glm::vec3 color = glm::mix(glm::vec3(0, 0, 1), glm::vec3(1, 0, 0), percentage);
-
-		//vertex.normal = vertex.position;
-		//vertex.normal = glm::vec3(0, 1, 0);
-		//std::cout << color.x << " " << color.y << " " << color.z << "\n";
-
-	}
-
-
-	std::cout << "Read " << vertices.size() << " vertices\n";
+	//std::cout << "Read " << vertices.size() << " vertices\n";
 }
 
 void PunktSky::Bind()
