@@ -4,7 +4,6 @@
 #include "../Components/TransformComponent.h"
 #include "../Components/VelocityComponent.h"
 #include "../Components/InputComponent.h"
-#include "glfw-3.3.9/include/GLFW/glfw3.h"
 
 class PickupSystem : public SystemBase
 {
@@ -13,7 +12,7 @@ public:
 	{
 		if (entityfloat->GetComponent<PickupComponent>())
 		{
-			if (auto TC = entityfloat->GetComponent<TransformComponent>())
+			if (TransformComponent* TC = entityfloat->GetComponent<TransformComponent>())
 			{
 				TC->transform.AddRotation(glm::vec3(0, 180 * DeltaTime, 0));
 

@@ -73,7 +73,7 @@ void ECSManager::Setup()
 	}
 
 	// Create Enemies
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 10000; i++)
 	{
 		CreateEnemy(glm::vec3(rand() % 100 - 50, 1, (rand() % 100 - 50) + 50));
 		
@@ -118,6 +118,7 @@ void ECSManager::Update(float DeltaTime)
 			{
 				std::cout << "Player died" << std::endl;
 				std::cout << "Quitting Game" << std::endl;
+				std::cout << "\n \n \n \n \n \n \n \n \n \n \n \n  No Crash" << std::endl;
 			}
 
 			Entities.erase(std::remove(Entities.begin(), Entities.end(), entity), Entities.end());
