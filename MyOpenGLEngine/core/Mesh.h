@@ -39,10 +39,11 @@ public:
 	ShaderProgram* shaderProgram;
 	bool renderDots = false;
 	float DotsSize = 1.0f;
-	bool NormalAsColor = false;
+	bool VertexColorAsColor = false;
 	bool isBound = false;
 	bool BindDynamic = false;
 	bool HasBoundOnce = false;
+	bool Hide = false;
 
 	// Transform Data
 	Transform transform;
@@ -50,6 +51,13 @@ public:
 	glm::mat4 Transformmat = glm::mat4(1);
 	glm::mat4 GetTransformMat();
 
+
+	//TEMP
+	float minX;
+	float minZ;
+
+	float maxX;
+	float maxZ;
 
 	glm::mat4 GetGlobalTransform();
 

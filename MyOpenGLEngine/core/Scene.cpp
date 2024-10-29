@@ -88,55 +88,71 @@ void Scene::LoadContent()
 	//MeshGenerator::GenerateCubeWithHardEdges(BigBoxMesh, glm::vec3(1.0f, 1.f, 1.0f));
 
 
-	Mesh* FloorMesh = CreateAndRegisterMesh<Mesh>("FloorMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
-	FloorMesh->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
-	FloorMesh->material.shininess = 8.f;
+	//Mesh* FloorMesh = CreateAndRegisterMesh<Mesh>("FloorMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
+	//FloorMesh->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
+	//FloorMesh->material.shininess = 8.f;
 
-	Mesh* RighWall = CreateAndRegisterMesh<Mesh>("RighWall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
-	RighWall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
+	//Mesh* RighWall = CreateAndRegisterMesh<Mesh>("RighWall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
+	//RighWall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
 
-	Mesh* Leftwall = CreateAndRegisterMesh<Mesh>("Leftwall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
-	Leftwall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
+	//Mesh* Leftwall = CreateAndRegisterMesh<Mesh>("Leftwall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
+	//Leftwall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
 
-	Mesh* TopWall = CreateAndRegisterMesh<Mesh>("TopWall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
-	TopWall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
+	//Mesh* TopWall = CreateAndRegisterMesh<Mesh>("TopWall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
+	//TopWall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
 
-	Mesh* BottomWall = CreateAndRegisterMesh<Mesh>("BottomWall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
-	BottomWall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
+	//Mesh* BottomWall = CreateAndRegisterMesh<Mesh>("BottomWall", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, FloorMesh, true);
+	//BottomWall->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
 
-	MeshGenerator::GeneratePoolTable(FloorMesh, TopWall, BottomWall, RighWall, Leftwall, glm::vec3(200.f, 10.f, 200.f));
-	//MeshGenerator::GeneratePoolTable(FloorMesh, TopWall, BottomWall, RighWall, Leftwall, glm::vec3(20, 2, 40));
+	//MeshGenerator::GeneratePoolTable(FloorMesh, TopWall, BottomWall, RighWall, Leftwall, glm::vec3(200.f, 10.f, 200.f));
+	////MeshGenerator::GeneratePoolTable(FloorMesh, TopWall, BottomWall, RighWall, Leftwall, glm::vec3(20, 2, 40));
 
-	FloorMesh->Static = true;
-	RighWall->Static = true;
-	Leftwall->Static = true;
-	TopWall->Static = true;
-	BottomWall->Static = true;
+	//FloorMesh->Static = true;
+	//RighWall->Static = true;
+	//Leftwall->Static = true;
+	//TopWall->Static = true;
+	//BottomWall->Static = true;
 
 
 
 	Mesh* Landscape = CreateAndRegisterMesh<Mesh>("Landscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
-	FloorMesh->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
-	FloorMesh->material.shininess = 8.f;
+	//Mesh* LandscapeTriangulated = CreateAndRegisterMesh<Mesh>("LandscapeTriangulated", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, Landscape, true);
 
 	//std::filesystem::path path = "../../../core/pointCloud.txt";
 	//std::filesystem::path path = "../../../core/vsim_las.txt";
-	std::filesystem::path path = "C:/Users/soroe/Downloads/eksport_975985_20241023/CroppedCloud.txt";
-	punktSky.ReadFile(path, Landscape);
+	std::filesystem::path path = "C:/Users/soroe/Downloads/CroppedCloud.txt";
+	std::vector<Mesh*> triangulatedChunks;
+	PunktSky::ReadFileMesh(path, Landscape, triangulatedChunks);
+
+	for (auto triangulated_chunk : triangulatedChunks)
+	{
+		triangulated_chunk->shaderProgram = shaderProgram;
+		triangulated_chunk->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
+		triangulated_chunk->material.shininess = 8.f;
+		triangulated_chunk->Parent = Landscape;
+		Landscape->AddChild(triangulated_chunk);
+	}
 	//Landscape->vertices = punktSky.vertices;
 	//Landscape->renderDots = true;
-	//Landscape->NormalAsColor = true;
+	//Landscape->VertexColorAsColor = true;
 
 
 	// -------------------  BSPLINE SURFACE ------------------- //
 	Mesh* BSplineMesh = CreateAndRegisterMesh<Mesh>("BSplineMesh", glm::vec3(0.f, 5.f, 0.f), glm::vec3(0,180,0), glm::vec3(1.f), shaderProgram, nullptr, true);
 	Mesh* BSplineControlMesh = CreateAndRegisterMesh<Mesh>("BSplineControlMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, BSplineMesh, true);
 	BSplineControlMesh->renderDots = true;
+
 	std::vector<std::vector<glm::vec3>> controlPoints = {
 	   { glm::vec3(0, 0, 0), glm::vec3(1, 0, 1), glm::vec3(2, 0, 0) },
 	   { glm::vec3(0, 1, 1), glm::vec3(1, 1, 2), glm::vec3(2, 1, 1) },
 	   { glm::vec3(0, 2, 0), glm::vec3(1, 2, 1), glm::vec3(2, 2, 0) }
 	};
+
+	//controlPoints = {
+	//	{glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(2.0, 0.0, 0.0), glm::vec3(3.0, 0.0, 0.0)},
+	//	{glm::vec3(0.0, 1.0, 0.0), glm::vec3(1.0, 1.0, 2.0), glm::vec3(2.0, 1.0, 2.0), glm::vec3(3.0, 1.0, 0.0)},
+	//	{glm::vec3(0.0, 2.0, 0.0), glm::vec3(1.0, 2.0, 0.0), glm::vec3(2.0, 2.0, 0.0), glm::vec3(3.0, 2.0, 0.0)},
+	//};
 
 	//std::vector<std::vector<glm::vec3>> controlPoints = {
 	//{ glm::vec3(0, 0, 0), glm::vec3(1, 0, 0), glm::vec3(2, 0, 0), glm::vec3(3, 0, 0) },

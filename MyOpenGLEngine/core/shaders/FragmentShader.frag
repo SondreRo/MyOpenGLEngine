@@ -5,6 +5,7 @@ out vec4 FragColor;
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoord;
+in vec3 VerColor;
 
 uniform sampler2D ourTexture;
 uniform int useTexture;
@@ -88,6 +89,7 @@ void main()
     {
         //FragColor = vec4(FragPos, 1);
         FragColor = vec4(Normal, 1);
+        FragColor = vec4(VerColor, 1);
         //FragColor = vec4(1, 0, 0, 1);
     }
     else

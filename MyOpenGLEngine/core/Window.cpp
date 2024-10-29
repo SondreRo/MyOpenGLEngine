@@ -59,8 +59,8 @@ void Window::Init()
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //Draw one side of triangle
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -365,7 +365,6 @@ void Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 		// Fill mode
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-
     if (mScene)
         mScene->KeyCallback(this, key, scancode, action, mods);
 }

@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include <imgui.h>
 
+#include "Application.h"
+
 Camera::Camera()
 {
 }
@@ -79,6 +81,14 @@ void Camera::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_T && action == GLFW_PRESS)
 	{
 		
+	}
+
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+	{
+		if (Mesh* CurrentMesh = Application::get().mScene.SelectedMesh)
+		{
+			cameraPos = CurrentMesh->transform.GetLocation() - cameraFront * 20.f;
+		}
 	}
 }
 

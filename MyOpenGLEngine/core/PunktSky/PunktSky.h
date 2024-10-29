@@ -1,38 +1,23 @@
 #pragma once
-#include <vector>
 #include "Vertex.h"
-
+#include <vector>
 #include <filesystem>
-#include <fstream> 
 
-#include "ShaderProgram.h"
-#include "Material.h"
-#include <queue>
+//#include <queue>
 
-#include <thread>
+//#include <thread>
 #include "mesh.h"
 
 class PunktSky {
 
 public:
 
-	~PunktSky();
-	bool shouldClose = false;
-	std::vector<Vertex> vertices;
-	
-	void ReadFile(std::filesystem::path path, Mesh* mesh);
+	static void ReadFile(std::filesystem::path path, Mesh* mesh);
 
-	ShaderProgram* shaderProgram;
-	Material material;
+	static void CreateChunks(Mesh* mesh, glm::vec3 min, glm::vec3 max, std::vector<Mesh*>& chunks);
 
-	void ReadFileThreaded(std::filesystem::path path, Mesh* mesh);
-	//std::queue<Vertex> verticesQueue;
+	static void ReadFileMesh(std::filesystem::path path, Mesh* mesh, std::vector<Mesh*>& finalchunks);
 
-	
+	static void TriangulateMesh(Mesh* mesh, glm::vec3 min, glm::vec3 max, float Resolution, Mesh* triangulatedMesh);
 
-	unsigned int VAO, VBO;
-	bool isBound = false;
-
-	void Bind();
-	void Draw();
 };

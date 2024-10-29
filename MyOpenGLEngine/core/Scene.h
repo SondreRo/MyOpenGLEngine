@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 #include "ECS/ECSManager.h"
-#include "PunktSky/PunktSky.h"
+
 
 
 class Window;
@@ -60,8 +60,6 @@ public:
 	//ShaderProgram* shaderProgram;
 
 	ECSManager ecs_manager;
-	PunktSky punktSky;
-	
 	std::unordered_map<std::string, Mesh*> Meshes;
 	std::unordered_map<std::string, ShaderProgram*> Shaders;
 

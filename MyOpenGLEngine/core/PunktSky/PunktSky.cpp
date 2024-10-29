@@ -1,11 +1,12 @@
+#include "Application.h"
 #include "PunktSky.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
-#include "Application.h"
+#include "MeshGenerator.h"
 
-void PunktSky::ReadFileThreaded(std::filesystem::path path, Mesh* mesh)
+void PunktSky::ReadFileMesh(std::filesystem::path path, Mesh* mesh, std::vector<Mesh*>& finalchunks)
 {
 	// Exit Early if file does not exist
 	if (!std::filesystem::exists(path))
@@ -20,117 +21,237 @@ void PunktSky::ReadFileThreaded(std::filesystem::path path, Mesh* mesh)
 	std::ifstream file(path); // Open file
 	std::string line;
 
+	if (!file.is_open())
+	{
+		std::cout << "Could not open file: " << path << "\n";
+		return;
+	}
 
-	std::vector<Vertex> vertices;
-	vertices.reserve(1000000);
-
-	//mesh->transform.SetScale(glm::vec3(0.01f));
-
+	mesh->vertices.reserve(100000);
 	mesh->renderDots = true;
-	//mesh->vertices.reserve(1000000);
-	//mesh->BindDynamic = true;
 
-	glm::vec3 offsett = glm::vec3(0, 0, 0);
+	std::getline(file, line);
+	std::cout << "Reading file with: " << line << " lines\n";
 
 	int Line = 0;
 	while (std::getline(file, line))
 	{
-		if (shouldClose)
-		{
-			return;
-		}
-
-		Line++;
-		//if (Line > 1000000)
-		//{
-		//	break;
-		//}
-
-	
+		Line++;	
 
 		if (Line % 100000 == 0)
 		{
 			std::cout << "Reading line: " << Line << "\n";
-			//mesh->isBound = false;
+		}
 
-			
-			if (mesh->ReadingFirst == true)
+		std::stringstream ss(line);
+
+		glm::vec3 position;
+		glm::vec3 color = glm::vec3(1.f);
+		glm::vec3 normal = glm::vec3(0.f, 1.f, 0.f);
+
+		//ss >> position.x >> position.z >> position.y;
+		ss >> position.x >> position.z >> position.y >> color.x >> color.y >> color.z;
+
+		min = glm::min(min, position);
+		max = glm::max(max, position);
+
+		mesh->vertices.emplace_back(position,normal,glm::vec2(0), color);
+	}
+
+	glm::vec3 mid = (min + max) / 2.f;
+	for (auto& vertex : mesh->vertices)
+	{
+		vertex.position -= mid;
+		vertex.position.x *= -1.f;
+
+	}
+
+	min -= mid;
+	max -= mid;
+
+
+	std::vector<Mesh*> chunks;
+	CreateChunks(mesh, min, max, chunks);
+
+	for (auto chunk : chunks)
+	{
+		if (chunk->vertices.size() == 0)
+		{
+			continue;
+		}
+		std::string ChunkName = "Chunk: " + std::to_string(chunk->vertices[0].position.x) + " " + std::to_string(chunk->vertices[0].position.z);
+		Mesh* TriangulatedChunk = new Mesh(ChunkName);
+
+
+		TriangulateMesh(chunk, min, max, 1, TriangulatedChunk);
+		TriangulatedChunk->VertexColorAsColor = true;
+		finalchunks.push_back(TriangulatedChunk);
+		
+	}
+
+
+}
+
+void PunktSky::TriangulateMesh(Mesh* mesh, glm::vec3 min, glm::vec3 max, float Resolution, Mesh* triangulatedMesh)
+{
+
+	//float x = mesh->minX;
+	//float z = mesh->minY;
+	float MinX = FLT_MAX;
+	float MinZ = FLT_MAX;
+
+	float MaxX = -FLT_MAX;
+	float MaxZ = -FLT_MAX;
+	for (auto element : mesh->vertices)
+	{
+		MinX = glm::min(MinX, element.position.x);
+		MinZ = glm::min(MinZ, element.position.z);
+
+		MaxX = glm::max(MaxX, element.position.x);
+		MaxZ = glm::max(MaxZ, element.position.z);
+	}
+
+
+
+	/*float x = min.x;
+	float z = min.z;*/
+	float x = MinX;
+	float z = MinZ;
+
+
+	unsigned int LineCount = 0;
+	unsigned int xCount = 0;
+	unsigned int zCount = 0;
+
+	//Starttimer
+	auto start = std::chrono::high_resolution_clock::now();
+
+	while (x <= MaxX)
+	{
+		xCount++;
+		while (z <= MaxZ)
+		{
+			zCount++;
+			LineCount++;
+
+
+			if (LineCount % 1000 == 0)
 			{
-				mesh->ReadingFirst = false;
+				std::cout << "Triangulating Line: " << LineCount << "\n";
+			}
+			
+			// Create a square
+			// 0 1
+			// 2 3
+
+			float Height = 0;
+			glm::vec3 Color = glm::vec3(0, 0, 0);
+			unsigned int count = 0;
+
+			// Get the height of the terrain
+			for (auto& vertex : mesh->vertices)
+			{
+				if (vertex.position.x > x - Resolution && vertex.position.x < x + Resolution && 
+					vertex.position.z > z - Resolution && vertex.position.z < z + Resolution)
+				{
+					Color += vertex.color;
+					count++;
+					Height += vertex.position.y;
+					break;
+				}
+
+			}
+
+
+			if (count > 0)
+			{
+				Height /= count;
+				Color /= count;
 			}
 			else
 			{
-				mesh->ReadingFirst = true;
+				Height = -50;
 			}
-			mesh->isBound = false;
-		}
-		Vertex vertex;
-		std::stringstream ss(line);
-		ss >> vertex.position.x >> vertex.position.z >> vertex.position.y >> vertex.normal.x >> vertex.normal.y >> vertex.normal.z;
 
-		if (Line == 1)
-		{
-			offsett = vertex.position;
-		}
+			triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height, z), glm::vec3(0, 1, 0), glm::vec2(0), Color);
+			//if (LineCount == 1)
+			//{
+			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 1, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
+			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 2, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
+			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 3, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
 
-		vertex.position -= offsett;
+			//}
+			//if (LineCount == 2)
+			//{
+			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 1, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
+			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 2, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
+			//	
 
-		//min = glm::min(min, vertex.position);
-		//max = glm::max(max, vertex.position);
+			//}
 
-		if (mesh->ReadingFirst == true)
-		{
-			mesh->incomming_vertices2.push(vertex);
+			z += Resolution;
 		}
-		else
-		{
-			mesh->incomming_vertices.push(vertex);
-		}
-		//vertices.push_back(vertex);
+		z = MinZ;
+		x += Resolution;
 	}
-	if (shouldClose)
+
+	if (xCount == 0)
 	{
-		return;
+		zCount = 0;
 	}
-	std::cout << "Read File With: " << Line << " lines\n";
+	else
+	{
+		zCount /= xCount;
 
-	//glm::vec3 mid = (min + max) / 2.f;
-	//for (auto& vertex : mesh->vertices)
-	//{
-	//	vertex.position -= mid;
-	//}
-
-	mesh->isBound = false;
-	//for (auto& vertex : vertices)
-	//{
-	//	vertex.position -= mid;
-	//}
-
-	//mesh->transform.SetScale(glm::vec3(1));
+	}
 
 
-	//Mesh* newMesh = new Mesh("PunktSky");
-	//newMesh->vertices = vertices;
-	//newMesh->material = material;
-	//newMesh->shaderProgram = Application::get().mScene.Shaders["DefaultShader"];
-	//newMesh->Parent = Application::get().mScene.RootMesh;
-	//newMesh->Parent->Children.push_back(newMesh);
-	//newMesh->renderDots = true;
+    // set up indices
+    triangulatedMesh->indices.reserve((xCount - 1) * (zCount - 1) * 6);
+			
+	for (int NewX = 0; NewX < xCount - 1; NewX++)
+	{
+		for (int NewZ = 0; NewZ < zCount - 1; NewZ++)
+		{
+			unsigned int TopLeft = (NewX * zCount) + NewZ;
+			unsigned int TopRight = (NewX * zCount) + (NewZ + 1);
+			unsigned int BottomLeft = ((NewX + 1) * zCount) + NewZ;
+			unsigned int BottomRight = ((NewX + 1) * zCount) + (NewZ + 1);
 
-	//Application::get().mScene.MeshQueue.push(newMesh);
+			triangulatedMesh->indices.push_back(TopLeft);
+			// 2
+			triangulatedMesh->indices.push_back(TopRight);
+			// 1
+			triangulatedMesh->indices.push_back(BottomLeft);
+			// 3
+			triangulatedMesh->indices.push_back(BottomLeft);
+			// 3
+			triangulatedMesh->indices.push_back(TopRight);
+			// 1
+			triangulatedMesh->indices.push_back(BottomRight);
 
-	std::cout << "Read " << vertices.size() << " vertices\n";
+
+
+		}
+		std::cout << "Done XLINE " << NewX << "\n";
+	}
+
+	//Output time
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> duration = end - start;
+	std::cout << "Triangulated " << LineCount << " lines in " << duration.count() << " seconds\n";
+
+	
+
+	MeshGenerator::GenerateNormals(triangulatedMesh);
+
 }
 
-PunktSky::~PunktSky()
-{
-	shouldClose = true;
-}
 
 void PunktSky::ReadFile(std::filesystem::path path, Mesh* mesh)
 {
-	std::thread t1(&PunktSky::ReadFileThreaded, this, path, mesh);
-	t1.detach();
+	/*std::thread t1(&PunktSky::ReadFileThreaded, this, path, mesh);
+	t1.detach();*/
 	//t1.join();
 
 	//if (!std::filesystem::exists(path))
@@ -326,40 +447,45 @@ void PunktSky::ReadFile(std::filesystem::path path, Mesh* mesh)
 	//std::cout << "Read " << vertices.size() << " vertices\n";
 }
 
-void PunktSky::Bind()
+void PunktSky::CreateChunks(Mesh* mesh, glm::vec3 min, glm::vec3 max, std::vector<Mesh*>& chunks)
 {
-	// VAO
-	glGenBuffers(1, &VBO);
+	float X = min.x;
+	float Z = min.z;
 
-	// VAO
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	float maxX = max.x;
+	float maxZ = max.z;
 
-	
+	float size = 100;
 
+	while (X < maxX)
+	{
+		while (Z < maxZ)
+		{
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+			std::string ChunkName = "Chunk: " + std::to_string(X) + " " + std::to_string(Z);
+			Mesh* NewChunk = new Mesh(ChunkName);
+			NewChunk->vertices.reserve(1000);
 
-	Vertex::BindAttributes();
+			for (auto& vertex : mesh->vertices)
+			{
+				if (vertex.position.x >= X && vertex.position.x <= X + size &&
+					vertex.position.z >= Z && vertex.position.z <= Z + size)
+				{
+					NewChunk->vertices.push_back(vertex);
+				}
+			}
+			NewChunk->minX = X;
+			NewChunk->minZ = Z;
 
-	isBound = true;
+			NewChunk->maxX = X + size;
+			NewChunk->maxZ = Z + size;
+			chunks.push_back(NewChunk);
 
-
-}
-
-void PunktSky::Draw()
-{
-	if (!isBound) {
-		Bind();
+			Z += size;
+		}
+		Z = min.z;
+		X += size;
 	}
 
-	material.BindMaterial(shaderProgram);
-	glPointSize(1.f);
-	shaderProgram->UseProgram();
-	shaderProgram->SetUniformMat4("model", glm::mat4(1));
 
-	glBindVertexArray(VAO);
-
-	glDrawArrays(GL_POINTS, 0, vertices.size());
 }

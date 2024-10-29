@@ -20,12 +20,14 @@ Mesh::~Mesh()
 void Mesh::Draw()
 {
 
+	if (Hide) return;
+
 	if (isBound == false)
 	{
 		Bind();
 	}
 
-	if (NormalAsColor)
+	if (VertexColorAsColor)
 	{
 		shaderProgram->SetUniform1i("useColorNormal", 1);
 	}
@@ -60,36 +62,15 @@ void Mesh::Update(float DeltaTime)
 {
 	Transformmat = transform.GetMatrix();
 	UpdateAABB();
-
-	//bool NewVerts = false;
-
-	if (ReadingFirst)
-	{
-		while (!incomming_vertices.empty())
-		{
-			vertices.push_back(incomming_vertices.front());
-			incomming_vertices.pop();
-		}
-	}
-	else
-	{
-		
-		while (!incomming_vertices2.empty())
-		{
-			vertices.push_back(incomming_vertices2.front());
-			incomming_vertices2.pop();
-		}
-	}
 }
 
 void Mesh::Bind()
 {
-
-	//if (HasBoundOnce)
-	//{
-	//	Unbind();
-	//}
-
+	if (HasBoundOnce)
+	{
+		Rebind();
+		return;
+	}
 	// VAO
 	glGenBuffers(1, &VBO);
 
@@ -134,6 +115,9 @@ void Mesh::Rebind()
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), BindMode);
+
+	isBound = true;
+	
 }
 
 void Mesh::Unbind()
@@ -168,6 +152,7 @@ void Mesh::RenderProperties()
 
 	ImGui::NewLine();
 	ImGui::Text("Material");
+	ImGui::Checkbox("Hide Mesh", &Hide);
 	ImGui::ColorEdit3("Diffuse", glm::value_ptr(material.diffuse));
 	ImGui::ColorEdit3("Specular", glm::value_ptr(material.specular));
 	ImGui::SliderFloat("Shininess", &material.shininess, 0.0f, 256.0f);
@@ -183,7 +168,7 @@ void Mesh::RenderProperties()
 		ImGui::SliderFloat("Dot Size", &DotsSize, 0.1f, 10.0f);
 	}
 
-	ImGui::Checkbox("Normal As Color", &NormalAsColor);
+	ImGui::Checkbox("VertexColor As Color", &VertexColorAsColor);
 }
 
 AxisAlignedBoundingBox Mesh::GetAABB()
