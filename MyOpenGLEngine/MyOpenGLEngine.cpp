@@ -6,12 +6,16 @@
 #include "Application.h"
 //#include "test.h"
 
+void IncrementInt(int& i)
+{
+	i = ++i;
+}
+
 using namespace std;
 
 int main()
 {
 	cout << "Hello CMake." << endl;
-
 
 	//Test t;
 	//t.MyTest();

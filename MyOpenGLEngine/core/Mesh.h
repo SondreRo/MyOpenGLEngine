@@ -44,6 +44,7 @@ public:
 	bool BindDynamic = false;
 	bool HasBoundOnce = false;
 	bool Hide = false;
+	bool useShading = true;
 
 	// Transform Data
 	Transform transform;

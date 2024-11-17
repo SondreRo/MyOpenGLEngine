@@ -9,6 +9,7 @@ in vec3 VerColor;
 
 uniform sampler2D ourTexture;
 uniform int useTexture;
+uniform int useShading;
 
 uniform vec3 viewPos;
 
@@ -88,8 +89,19 @@ void main()
     if (useColorNormal == 1)
     {
         //FragColor = vec4(FragPos, 1);
-        FragColor = vec4(Normal, 1);
-        FragColor = vec4(VerColor, 1);
+        //FragColor = vec4(Normal, 1);
+       // FragColor = vec4(VerColor, 1);
+
+       if (useShading == 0)
+       {
+         FragColor = vec4(VerColor, 1);
+       }
+       else
+       {
+        finalColor = ambientContribution + (NdL * VerColor * dl.color) + specularContribution;
+        FragColor = vec4(finalColor, 1);
+       }
+       
         //FragColor = vec4(1, 0, 0, 1);
     }
     else

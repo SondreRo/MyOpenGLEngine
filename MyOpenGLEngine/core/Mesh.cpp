@@ -35,6 +35,15 @@ void Mesh::Draw()
 		shaderProgram->SetUniform1i("useColorNormal", 0);
 	}
 
+	if (useShading)
+	{
+		shaderProgram->SetUniform1i("useShading", 1);
+	}
+	else
+	{
+		shaderProgram->SetUniform1i("useShading", 0);
+	}
+
 	glBindVertexArray(VAO);
 
 	unsigned int RenderMode;

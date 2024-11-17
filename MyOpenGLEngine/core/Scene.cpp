@@ -15,7 +15,7 @@
 #include <queue>
 
 #include "BSpline/BSplineSurface.h"
-
+#include "Landscape/Landscape.h"
 
 Scene::Scene(const std::string& name)
 {
@@ -117,18 +117,43 @@ void Scene::LoadContent()
 
 	Mesh* Landscape = CreateAndRegisterMesh<Mesh>("Landscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
 	//Mesh* LandscapeTriangulated = CreateAndRegisterMesh<Mesh>("LandscapeTriangulated", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, Landscape, true);
+	Landscape->Hide = true;
 
 	//std::filesystem::path path = "../../../core/pointCloud.txt";
 	//std::filesystem::path path = "../../../core/vsim_las.txt";
-	std::filesystem::path path = "C:/Users/soroe/Downloads/CroppedCloud.txt";
+	//std::filesystem::path path = "C:/Users/soroe/Downloads/CroppedCloud.txt";
+	std::filesystem::path path = "C:/Users/soroe/Downloads/Leira.txt";
+	//std::filesystem::path path = "C:/Users/soroe/Downloads/anders.txt";
+
+
 	std::vector<Mesh*> triangulatedChunks;
-	PunktSky::ReadFileMesh(path, Landscape, triangulatedChunks);
+	PunktSky* PunktSkyReader = new PunktSky();
+	//PunktSkyReader->ReadFileMesh(path, Landscape, triangulatedChunks, 20, 0.5f, true);
+
+	class Landscape newLandscape;
+	newLandscape.ReadPointCloudFile(path);
+
+	int Counter = 0;
+	for (auto chu : newLandscape.chunks)
+	{
+		Counter++;
+		std::string Name = "Chunk" + std::to_string(Counter);
+		Mesh* NewMesh = CreateAndRegisterMesh<Mesh>(Name, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0, 0, 0), glm::vec3(1.f), shaderProgram, nullptr, true);
+		//NewMesh->vertices = chu->verticesTriangulated;
+		NewMesh->vertices = chu->vertices;
+		NewMesh->indices = chu->indices;
+		NewMesh->VertexColorAsColor = true;
+		NewMesh->DotsSize = true;
+	}
+
 
 	for (auto triangulated_chunk : triangulatedChunks)
 	{
 		triangulated_chunk->shaderProgram = shaderProgram;
 		triangulated_chunk->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
-		triangulated_chunk->material.shininess = 8.f;
+		triangulated_chunk->material.specular = glm::vec3(0.2f, 0.2f, 0.2f);
+		triangulated_chunk->material.shininess = 64.f;
+		triangulated_chunk->useShading = false;
 		triangulated_chunk->Parent = Landscape;
 		Landscape->AddChild(triangulated_chunk);
 	}
@@ -202,7 +227,12 @@ void Scene::LoadContent()
 	BSplineMesh->indices = indices;
 
 	MeshGenerator::GenerateNormals(BSplineMesh);
-	
+
+
+	Mesh* NewMesh = CreateAndRegisterMesh<Mesh>("NewMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
+
+	MeshGenerator::GenerateSphere(NewMesh, 10, 10, 10);
+
 	//for (int i = 0; i < 10; ++i)
 	//{
 
@@ -398,6 +428,7 @@ void Scene::Init()
 
 void Scene::Update(float DeltaTime)
 {
+	lineMesh->AddLine(camera->cameraPos, Meshes["Landscape"]->transform.GetLocation());
 
 	while (MeshQueue.size() > 0)
 	{
@@ -445,6 +476,9 @@ void Scene::Render(float DeltaTime, int width, int height)
 	// SceneGraph
 	RenderSceneGraph(RootMesh, DeltaTime, width, height, glm::mat4(1));
 	RenderSceneGraphVisuals();
+
+
+
 	//collision_manager->Render(lineMesh);
 	//lineMesh->AddLine(glm::vec3(0, 0, 0), glm::vec3(10, 5, 2));
 
