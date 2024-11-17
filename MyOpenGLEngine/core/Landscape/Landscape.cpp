@@ -20,6 +20,13 @@ std::queue<Chunk> Landscape::chunkQueueOutput;
 
 void Landscape::ReadPointCloudFile(std::filesystem::path filePath)
 {
+
+	if (ReadChunksFromFile())
+	{
+		std::cout << "Read Chunks from file" << std::endl;
+		return;
+	}
+
 	std::cout << "\n";
 	std::cout << "Reading file: " << filePath << std::endl;
 
@@ -55,6 +62,8 @@ void Landscape::ReadPointCloudFile(std::filesystem::path filePath)
 	StartFillChunks();
 	
 	StartTriangulateChunks();
+
+	WriteChunksToFile();
 }
 
 void Landscape::GetVerticesFromFile(std::ifstream& file, glm::vec3& min, glm::vec3& max)
@@ -90,7 +99,7 @@ void Landscape::GetVerticesFromFile(std::ifstream& file, glm::vec3& min, glm::ve
 
 	unsigned int LineNumber = 0;
 
-	std::cout << "Reding Files: \n" << "|--------------------|\n" << "|";
+	std::cout << "Reading Files: \n" << "|--------------------|\n" << "|";
 
 	int LineTestCheck = amountOfVertices / 20;
 
@@ -194,6 +203,13 @@ void Landscape::StartFillChunks()
 
 	std::cout << "Thread Count: " << threadCount << "\n";
 
+	std::cout << "|";
+	for (int i = 0; i < threadCount; ++i)
+	{
+		std::cout << "-";
+	}
+	std::cout << "|\n|";
+
 	std::vector<std::thread> threads;
 	for (int i = 0; i < threadCount; ++i)
 	{
@@ -209,7 +225,7 @@ void Landscape::StartFillChunks()
 			thread.join();
 		}
 	}
-
+	std::cout << "|\n";
 	std::cout << "Done Filling Chunks" << '\n';
 }
 
@@ -249,40 +265,183 @@ void Landscape::StartTriangulateChunks()
 
 }
 
+void Landscape::WriteChunksToFile()
+{
+	//Create new folder
+	std::filesystem::path outputFolder = "Landscape";
+
+	if (!std::filesystem::exists(outputFolder))
+		std::filesystem::create_directory(outputFolder);
+
+	std::cout << "Writing Chunks to file: " << outputFolder << std::endl;
+
+	// Create new file in the folder
+	std::filesystem::path outputFilePath = outputFolder / "Landscape.txt";
+	std::ofstream outputFile(outputFilePath, std::ios::trunc);
+
+
+	if (!outputFile.is_open())
+	{
+		std::cerr << "Error: Could not open file for writing.\n";
+		return;
+	}
+
+	outputFile << chunks.size() << "\n";
+
+	// Write the vertices to the file
+	for (auto chunk : chunks)
+	{
+		outputFile << chunk->MinX << " " << chunk->MinZ << " " << chunk->MaxX << " " << chunk->MaxZ << "\n";
+		outputFile << chunk->verticesTriangulated.size() << "\n";
+		for (auto& vertex : chunk->verticesTriangulated)
+		{
+			outputFile << 
+				vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << " " << 
+				vertex.color.r << " " << vertex.color.g << " " << vertex.color.b << " " << 
+				vertex.normal.x << " " << vertex.normal.y << " " << vertex.normal.z <<"\n";
+		}
+
+		outputFile << chunk->indices.size() << "\n";
+		for (int i = 0; i < chunk->indices.size(); i+=3)
+		{
+			outputFile << chunk->indices[i] << " " << chunk->indices[i + 1] << " " << chunk->indices[i + 2] << "\n";
+		}
+		//outputFile << "\n";
+	}
+
+	outputFile.close();
+	std::cout << "Done Writing Chunks to file" << '\n';
+}
+
+bool Landscape::ReadChunksFromFile()
+{
+	//OpenFile
+	std::filesystem::path outputFolder = "Landscape";
+	std::filesystem::path outputFilePath = outputFolder / "Landscape.txt";
+	std::ifstream outputFile(outputFilePath);
+
+	if (!outputFile.is_open())
+	{
+		std::cout << "Error: File not found" << std::endl;
+		return false;
+	}
+	std::cout << "Reading Chunks from file: " << outputFilePath << std::endl;
+
+	std::string currentLine;
+
+	// Loop for checking comments and empty lines
+	std::getline(outputFile, currentLine);
+	std::cout << "I AM GOING TO READ : " << currentLine << "\n";
+	int ChunkCount;
+
+	std::stringstream ss(currentLine);
+	ss >> ChunkCount;
+
+
+	for (int i = 0; i < ChunkCount; i++)
+	{
+        Chunk* NewChunk = new Chunk();
+		std::getline(outputFile, currentLine);
+
+        std::stringstream ss(currentLine);
+        ss >> NewChunk->MinX >> NewChunk->MinZ >> NewChunk->MaxX >> NewChunk->MaxZ;
+
+        int amountOfVertices = 0;
+        std::getline(outputFile, currentLine);
+        ss = std::stringstream(currentLine);
+        ss >> amountOfVertices;
+
+        for (int y = 0; y < amountOfVertices; y++)
+        {
+	        std::getline(outputFile, currentLine);
+	        ss = std::stringstream(currentLine);
+	        Vertex NewVertex;
+	        ss >> NewVertex.position.x >> NewVertex.position.y >> NewVertex.position.z >> NewVertex.color.r >> NewVertex.color.g >> NewVertex.color.b >> NewVertex.normal.x >> NewVertex.normal.y >> NewVertex.normal.z;
+	        NewChunk->verticesTriangulated.push_back(NewVertex);
+        }
+
+        int amountOfIndices = 0;
+        std::getline(outputFile, currentLine);
+        ss = std::stringstream(currentLine);
+        ss >> amountOfIndices;
+		amountOfIndices /= 3;
+
+        for (int y = 0; y < amountOfIndices; y++)
+        {
+	        std::getline(outputFile, currentLine);
+	        ss = std::stringstream(currentLine);
+	        unsigned int index1, index2, index3;
+	        ss >> index1 >> index2 >> index3;
+	        NewChunk->indices.push_back(index1);
+	        NewChunk->indices.push_back(index2);
+	        NewChunk->indices.push_back(index3);
+        }
+
+		chunks.push_back(NewChunk);
+	}
+
+	std::cout << "Read " << chunks.size() << " Chunks from file" << std::endl;
+	return true;
+}
+
 void Landscape::Thread_ChunkFill_worker()
 {
+	//while (!chunkQueueInput.empty())
+	//{
+	//	Chunk* ThisChunk;
+	//	{
+	//		std::unique_lock<std::mutex> lock(queueMutex);
+
+	//		//cv.wait(lock, [] { return !chunkQueueInput.empty(); }); // Wait until inputQueue has elements
+
+	//		// Get a pointer from inputQueue
+	//		ThisChunk = chunkQueueInput.front();
+	//		chunkQueueInput.pop();
+	//	}
+	//	
+	//
+	//	//Fill the chunk
+	//	FillChunksWithVertex(ThisChunk);
+
+	//	//{
+	//	//	std::unique_lock<std::mutex> lock(queueMutex);
+	//	//	chunkQueueOutput.push(ThisChunk);
+	//	//}
+	//}
+	//std::cout << "-";
 	while (true)
 	{
-		if (chunkQueueInput.empty())
-		{
-			break;
-		}
-		Chunk* ThisChunk;
+		Chunk* ThisChunk = nullptr;
+
 		{
 			std::unique_lock<std::mutex> lock(queueMutex);
-			cv.wait(lock, [] { return !chunkQueueInput.empty(); }); // Wait until inputQueue has elements
 
-			// Get a pointer from inputQueue
+			// Wait until there are elements in the queue or stop signal
+			//cv.wait(lock, [this] { return !chunkQueueInput.empty(); });
+
+			// Break the loop if queue is empty and processing is done
+			if (chunkQueueInput.empty())
+				break;
+
+			// Fetch the next chunk
 			ThisChunk = chunkQueueInput.front();
 			chunkQueueInput.pop();
 		}
-		
-	
-		//Fill the chunk
-		FillChunksWithVertex(ThisChunk);
 
-		//{
-		//	std::unique_lock<std::mutex> lock(queueMutex);
-		//	chunkQueueOutput.push(ThisChunk);
-		//}
+		// Process the chunk outside the lock to avoid blocking other threads
+		if (ThisChunk)
+		{
+			FillChunksWithVertex(ThisChunk);
+		}
 	}
-	std::cout << "|";
+
+	std::cout << "-";
 }
 
 void Landscape::FillChunksWithVertex(Chunk* inChunk)
 {
 	std::vector<Vertex> newVertices;
-	float Padding = TriangleSize;
+	float Padding = TriangleSize * 1.5f;
 	//inChunk->vertices.reserve(vertices.size());
 	for (auto vertex : vertices)
 	{
@@ -341,7 +500,13 @@ void Landscape::TriangulateChunk(Chunk* inChunk)
 
 	std::vector<Vertex> newVertices;
 
-	while (CurX <= inChunk->MaxX)
+	if (vertices.empty())
+	{
+		std::cout << "No vertices in mesh\n";
+		return;
+	}
+
+	while (CurX <= inChunk->MaxX )
 	{
 		xCount++;
 		while (CurZ <= inChunk->MaxZ)
@@ -354,16 +519,17 @@ void Landscape::TriangulateChunk(Chunk* inChunk)
 			unsigned int count = 0;
 
 			// Get the height of the terrain
-			for (auto& vertex : inChunk->vertices)
+			for (const auto& vertex : inChunk->vertices)
 			{
 				/*if (vertex.position.x > CurX - MeshResolution && vertex.position.x < CurX + MeshResolution &&
 					vertex.position.z > CurZ - MeshResolution && vertex.position.z < CurZ + MeshResolution)*/
-				if (vertex.position.x > CurX && vertex.position.x < CurX &&
-					vertex.position.z > CurZ && vertex.position.z < CurZ )
+				if (vertex.position.x > CurX - MeshResolution && vertex.position.x < CurX + MeshResolution &&
+					vertex.position.z > CurZ - MeshResolution && vertex.position.z < CurZ + MeshResolution)
 				{
 					Color += vertex.color;
-					count++;
 					Height += vertex.position.y;
+					count++;
+
 					//break;
 
 				}
@@ -378,10 +544,11 @@ void Landscape::TriangulateChunk(Chunk* inChunk)
 			}
 			else
 			{
-				Height = -50;
+				//std::cout << "|";
+				Height = -200;
 			}
 			
-			inChunk->verticesTriangulated.push_back(Vertex(glm::vec3(CurX, Height, CurZ), glm::vec3(0, 1, 0), glm::vec2(0), Color));
+			inChunk->verticesTriangulated.emplace_back(glm::vec3(CurX, Height, CurZ), glm::vec3(0, 1, 0), glm::vec2(0), Color);
 			//if (LineCount == 1)
 			//{
 			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 1, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
@@ -399,7 +566,7 @@ void Landscape::TriangulateChunk(Chunk* inChunk)
 
 			CurZ += MeshResolution;
 		}
-		CurZ = inChunk->MinZ + (MeshResolution);
+		CurZ = inChunk->MinZ;// +(MeshResolution);
 		CurX += MeshResolution;
 	}
 
@@ -409,6 +576,7 @@ void Landscape::TriangulateChunk(Chunk* inChunk)
 	}
 	else
 	{
+		
 		zCount /= xCount;
 	}
 

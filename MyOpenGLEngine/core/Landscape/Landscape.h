@@ -24,7 +24,9 @@ private:
 	void CreateEmptyChunks(glm::vec3& min, glm::vec3& max);
 	void StartFillChunks();
 	void StartTriangulateChunks();
-	
+	void WriteChunksToFile();
+	bool ReadChunksFromFile();
+
 	// This function is only ran on the threads
 	void Thread_ChunkFill_worker();
 	// This function is only ran on the threads

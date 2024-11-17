@@ -139,11 +139,11 @@ void Scene::LoadContent()
 		Counter++;
 		std::string Name = "Chunk" + std::to_string(Counter);
 		Mesh* NewMesh = CreateAndRegisterMesh<Mesh>(Name, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0, 0, 0), glm::vec3(1.f), shaderProgram, nullptr, true);
-		//NewMesh->vertices = chu->verticesTriangulated;
-		NewMesh->vertices = chu->vertices;
+		NewMesh->vertices = chu->verticesTriangulated;
+		//NewMesh->vertices = chu->vertices;
 		NewMesh->indices = chu->indices;
 		NewMesh->VertexColorAsColor = true;
-		NewMesh->DotsSize = true;
+		//NewMesh->renderDots = true;
 	}
 
 
@@ -428,7 +428,7 @@ void Scene::Init()
 
 void Scene::Update(float DeltaTime)
 {
-	lineMesh->AddLine(camera->cameraPos, Meshes["Landscape"]->transform.GetLocation());
+	//lineMesh->AddLine(camera->cameraPos, Meshes["Landscape"]->transform.GetLocation());
 
 	while (MeshQueue.size() > 0)
 	{
