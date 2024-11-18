@@ -45,6 +45,7 @@ public:
 	bool HasBoundOnce = false;
 	bool Hide = false;
 	bool useShading = true;
+	bool UniformScale = true;
 
 	// Transform Data
 	Transform transform;

@@ -4,9 +4,18 @@
 #include "Timer.h"
 #include "Ball.h"
 #include "Application.h"
+#include "imgui_internal.h"
 
 void CollisionManager::BruteForceCollisionChecks()
 {
+	if(FreezeUpdates)
+		return;
+
+	if (CheckCollision == false)
+	{
+		return;
+	}
+
 	//Application::get().mScene.StartTimer("BruteColCheck");
 	for (int i = 0; i < meshes.size(); i++)
 	{
@@ -237,9 +246,282 @@ void CollisionManager::Render(LineMesh* inLineMesh)
 	//Application::get().mScene.EndTimer("renderCollisionManager");
 }
 
+void CollisionManager::Switch(glm::vec3& vector)
+{
+	glm::vec3 TempVec = vector;
+
+	vector.x = TempVec.x;
+	vector.y = TempVec.z;
+	vector.z = TempVec.y;
+}
+
 void CollisionManager::CollisionCheckDag(Ball* b1, Ball* b2, float dt)
 {
 	// Bruke likning (9.22)
 	glm::vec3 p1 = b1->transform.GetLocation() + b1->velocity;
 
+}
+
+void CollisionManager::PhysicsUpdate(float DeltaTime, LandscapeMesh* landscape, std::vector<Ball*> balls)
+{
+
+	ImGui::Begin("Physics");
+
+    std::string amount = "Balls" + std::to_string(balls.size());
+
+
+	ImGui::Text(amount.c_str());
+	ImGui::Checkbox("Render Lines", &RenderLines);
+	ImGui::Checkbox("Update Lines", &UpdateLines);
+
+	if (ImGui::Button("ClearLines"))
+	{
+		for (auto ball : balls)
+		{
+			ball->TracePoints.clear();
+		}
+	}
+
+	ImGui::Checkbox("CheckBallCollision", &CheckCollision);
+	ImGui::Checkbox("FreezeUpdates", &FreezeUpdates);
+	ImGui::End();
+
+	if (!FreezeUpdates)
+		Timer += DeltaTime;
+
+	bool BTimer = false;
+	if (Timer > 1)
+	{
+		Timer = 0;
+		BTimer = true;
+	}
+	for (auto ball: balls)
+	{
+		if (UpdateLines && !FreezeUpdates)
+		{
+			if (BTimer == true)
+			{
+				if (glm::length(ball->velocity) > 0.1f)
+				{
+					Vertex NewPoint = Vertex();
+					NewPoint.position = ball->transform.GetLocation();
+					glm::vec3 Fastcolor = glm::vec3(1, 0, 0);
+					glm::vec3 SlowColor = glm::vec3(0, 1, 0);
+					float Speed = glm::length(ball->velocity);
+					float MaxSpeed = 30;
+					float MinSpeed = 0;
+					float SpeedRange = MaxSpeed - MinSpeed;
+					float SpeedPercent = (Speed - MinSpeed) / SpeedRange;
+					NewPoint.color = glm::mix(SlowColor, Fastcolor, SpeedPercent);
+					NewPoint.normal = NewPoint.color;
+					ball->TracePoints.emplace_back(NewPoint);
+
+				}
+			}
+		}
+	
+
+		if (RenderLines)
+		{
+			for (int i = 0; i < ball->TracePoints.size(); i++)
+			{
+				if (i + 1 < ball->TracePoints.size())
+				{
+					Application::get().mScene.lineMesh->AddLine(ball->TracePoints[i], ball->TracePoints[i + 1]);
+				}
+				else
+				{
+					Application::get().mScene.lineMesh->AddLine(ball->TracePoints[i], ball->transform.GetLocation());
+				}
+			}
+		}
+		
+		if (!FreezeUpdates)
+			UpdateBall(ball, DeltaTime, landscape);
+	}
+}
+
+void CollisionManager::UpdateBall(Ball* ball, float DeltaTime, LandscapeMesh* landscape)
+{
+	if (!ball || !landscape) return;
+
+	glm::vec3 ballPosition = ball->transform.GetLocation();
+	Chunk* chunk = landscape->GetChunkFromPosition(ballPosition);
+	if (!chunk) return;
+
+	auto triangleResult = landscape->GetTriangleFromPosition(ballPosition);
+	if (!triangleResult.first) return;
+
+	const Triangle& triangle = triangleResult.second;
+
+	// Calculate height on triangle and normal
+	glm::vec3 realPosition = CollisionManager::BarycentricCheck(triangle, ballPosition);
+	glm::vec3 normal = glm::normalize(glm::cross(triangle.vB.position - triangle.vA.position,triangle.vC.position - triangle.vA.position));
+
+	// Adjust normal to match coordinate system
+	normal = glm::vec3(normal.x, normal.z, normal.y);
+
+	// Calculate acceleration vector
+	glm::vec3 acceleration = 9.81f * glm::vec3(
+		normal.x * normal.z,
+		normal.y * normal.z,
+		(normal.z * normal.z) - 1
+	);
+
+	// Swap Y and Z to match coordinate system
+	acceleration = glm::vec3(acceleration.x, acceleration.z, acceleration.y);
+
+	// Apply friction
+	float frictionCoefficient = triangle.Friction; // Get friction from triangle
+	glm::vec3 velocity = ball->velocity;
+	if (glm::length(velocity) > 0.0f) {
+		glm::vec3 frictionForce = -frictionCoefficient * glm::length(acceleration) * glm::normalize(velocity);
+		acceleration += frictionForce; // Friction reduces acceleration in velocity's direction
+	}
+
+
+	// Update velocity and position
+	ball->velocity += acceleration * DeltaTime;
+
+	glm::vec3 newPosition = ball->transform.GetLocation() + (ball->velocity * DeltaTime);
+	newPosition.y = realPosition.y + ball->Radius;
+
+	ball->transform.SetLocation(newPosition);
+
+
+
+
+
+
+
+	//glm::vec3 BallPos = ball->transform.GetLocation();
+	//Chunk* myChunk = landscape->GetChunkFromPosition(BallPos);
+	//if (myChunk == nullptr)
+	//{
+	//	return;
+	//}
+
+	//std::pair<bool, Triangle> Triangle = landscape->GetTriangleFromPosition(BallPos);
+	//if (!Triangle.first)
+	//{
+	//	return;
+	//}
+	//// Get HeightOnTriangle
+	//glm::vec3 RealPos = CollisionManager::BarycentricCheck(Triangle.second, BallPos);
+
+	//// Get Normal
+	//glm::vec3 Normal = glm::normalize(glm::cross(Triangle.second.vB.position - Triangle.second.vA.position, Triangle.second.vC.position - Triangle.second.vA.position));
+	//Normal = glm::vec3(Normal.x, Normal.z, Normal.y);
+
+	//// Get Acceleraion
+	//glm::vec3 AccelerasjonsVector = 9.81f * glm::vec3(Normal.x * Normal.z, Normal.y * Normal.z, (Normal.z * Normal.z) - 1);
+	//AccelerasjonsVector = glm::vec3(AccelerasjonsVector.x, AccelerasjonsVector.z, AccelerasjonsVector.y);
+
+
+	//// Get Velocity
+	//ball->velocity = ball->velocity + (AccelerasjonsVector * DeltaTime);
+
+
+
+
+	//// Update Position
+	//glm::vec3 NyPosition = ball->transform.GetLocation() + (ball->velocity * DeltaTime);
+	//NyPosition.y = RealPos.y + ball->Radius;
+	//ball->transform.SetLocation(NyPosition);
+}
+
+
+glm::vec3 CollisionManager::BarycentricCheck(Triangle triangle, glm::vec3 position)
+{
+	//glm::vec3 P = triangle.vA.position;
+	//glm::vec3 Q = triangle.vB.position;
+	//glm::vec3 R = triangle.vC.position;
+
+	//glm::vec3 p = position;
+
+	//P.y = 0;
+	//Q.y = 0;
+	//R.y = 0;
+	//p.y = 0;
+	//Switch(P);
+	//Switch(Q);
+	//Switch(R);
+	//Switch(p);
+
+	//float Ar = glm::length(glm::cross(Q - P, R - P));
+
+	//float U = (glm::cross(Q - position, R - position).z) / Ar;
+	//float V = (glm::cross(R - position, P - position).z) / Ar;
+	//float W = (glm::cross(P - position, Q - position).z) / Ar;
+
+	////float U = glm::length(glm::cross(Q - p, R - p)) / Ar; // Weight for Vertex A
+	////float V = glm::length(glm::cross(R - p, P - p)) / Ar; // Weight for Vertex B
+	////float W = glm::length(glm::cross(P - p, Q - p)) / Ar; // Weight for Vertex C
+
+	////// Ensure the point lies within the triangle
+	////if (U + V + W > 1.001f || U < 0 || V < 0 || W < 0) {
+	////	std::cout << "Point is outside the triangle" << std::endl;
+	////	return glm::vec3(0); // Or handle the error as needed
+	////}
+
+	////float xCoord = U * triangle.vA.position.x + V * triangle.vB.position.x + W * triangle.vC.position.x;
+	////float yCoord = U * triangle.vA.position.y + V * triangle.vB.position.y + W * triangle.vC.position.y;
+	////float zCoord = U * triangle.vA.position.z + V * triangle.vB.position.z + W * triangle.vC.position.z;
+
+
+	//glm::vec3 a = P;
+	//glm::vec3 b = Q;
+	//glm::vec3 c = R;
+
+	//P = triangle.vA.position;
+	//Q = triangle.vB.position;
+	//R = triangle.vC.position;
+
+	//Switch(P);
+	//Switch(Q);
+	//Switch(R);
+
+	//float xCoord = U * P.x + V * Q.x + W * R.x;
+	//float yCoord = U * P.y + V * Q.y + W * R.y;
+	//float zCoord = U * P.z + V * Q.z + W * R.z;
+
+
+
+	//return { position.x, yCoord, position.z};
+
+	glm::vec3 p1 = triangle.vA.position;
+	glm::vec3 p2 = triangle.vB.position;
+	glm::vec3 p3 = triangle.vC.position;
+	glm::vec3 p4 = position;
+
+	glm::vec3 p12 = p2 - p1;
+	glm::vec3 p13 = p3 - p1;
+	glm::vec3 cross = glm::cross(p13, p12);
+	float area_123 = cross.y; // double the area
+	glm::vec3 baryc; // for return
+
+	// u
+	glm::vec3 p = p2 - p4;
+	glm::vec3 q = p3 - p4;
+	glm::vec3 nu = glm::cross(q, p);
+	// double the area of p4pq
+	baryc.x = nu.y / area_123;
+
+	// v
+	p = p3 - p4;
+	q = p1 - p4;
+	glm::vec3 nv = glm::cross(q, p);
+	// double the area of p4pq
+	baryc.y = nv.y / area_123;
+
+	// w
+	p = p1 - p4;
+	q = p2 - p4;
+	glm::vec3 nw = (glm::cross(q, p));
+	// double the area of p4pq
+	baryc.z = nw.y / area_123;
+
+
+	glm::vec3 Adjusted = p1 * baryc.x + p2 * baryc.y + p3 * baryc.z;
+	return Adjusted;
 }

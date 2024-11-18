@@ -152,7 +152,14 @@ void Mesh::RenderProperties()
 
 	glm::vec3 scale = transform.GetScale();
 	ImGui::DragFloat3("Scale", glm::value_ptr(scale), 0.05f);
+
+	ImGui::Checkbox("Uniform Scale", &UniformScale);
+	if (UniformScale)
+	{
+		scale.x = scale.y = scale.z = scale.x;
+	}
 	transform.SetScale(scale);
+	
 
 	std::string VertexCount = "Vertex Count: " + std::to_string(vertices.size());
 	ImGui::Text(VertexCount.c_str());
@@ -178,6 +185,8 @@ void Mesh::RenderProperties()
 	}
 
 	ImGui::Checkbox("VertexColor As Color", &VertexColorAsColor);
+
+	ImGui::Checkbox("Use Shading", &useShading);
 }
 
 AxisAlignedBoundingBox Mesh::GetAABB()

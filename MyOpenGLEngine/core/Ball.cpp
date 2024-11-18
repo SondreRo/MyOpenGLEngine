@@ -53,19 +53,19 @@ void Ball::Update(float DeltaTime)
 		Resetball();
 	}
 
-	transform.AddLocation(velocity * DeltaTime);
+	//transform.AddLocation(velocity * DeltaTime);
 
 	//Gravity
 
 	
 
-	velocity.y -= 9.8f * DeltaTime;
+	//velocity.y -= 9.8f * DeltaTime;
 
-	if (transform.GetLocation().y < -10)
-	{
-		Resetball();
+	//if (transform.GetLocation().y < -10)
+	//{
+	//	Resetball();
 
-	}
+	//}
 }
 
 void Ball::RenderProperties()

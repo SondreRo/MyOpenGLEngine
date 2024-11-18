@@ -1,4 +1,4 @@
-#include "Landscape.h"
+#include "LandscapeGenerator.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -15,13 +15,13 @@ struct pair_hash {
 	}
 };
 
-std::queue<Chunk*> Landscape::chunkQueueInput;
-std::queue<Chunk> Landscape::chunkQueueOutput;
+std::queue<Chunk*> LandscapeGenerator::chunkQueueInput;
+std::queue<Chunk> LandscapeGenerator::chunkQueueOutput;
 
-void Landscape::ReadPointCloudFile(std::filesystem::path filePath)
+void LandscapeGenerator::ReadPointCloudFile(std::filesystem::path filePath)
 {
 
-	if (ReadChunksFromFile())
+	if (ReadChunksFromFile(filePath))
 	{
 		std::cout << "Read Chunks from file" << std::endl;
 		return;
@@ -63,10 +63,10 @@ void Landscape::ReadPointCloudFile(std::filesystem::path filePath)
 	
 	StartTriangulateChunks();
 
-	WriteChunksToFile();
+	WriteChunksToFile(filePath);
 }
 
-void Landscape::GetVerticesFromFile(std::ifstream& file, glm::vec3& min, glm::vec3& max)
+void LandscapeGenerator::GetVerticesFromFile(std::ifstream& file, glm::vec3& min, glm::vec3& max)
 {
 	// Variable to store the current line
 	std::string currentLine;
@@ -158,7 +158,7 @@ void Landscape::GetVerticesFromFile(std::ifstream& file, glm::vec3& min, glm::ve
 	std::cout << "Max: " << max.x << " " << max.y << " " << max.z << '\n';
 }
 
-void Landscape::CreateEmptyChunks(glm::vec3& min, glm::vec3& max)
+void LandscapeGenerator::CreateEmptyChunks(glm::vec3& min, glm::vec3& max)
 {
 	std::cout << "\n";
 	std::cout << "Generating Chunks: " << std::endl;
@@ -172,10 +172,12 @@ void Landscape::CreateEmptyChunks(glm::vec3& min, glm::vec3& max)
 			Chunk* chunk = new Chunk;
 			chunk->chunkSize = ChunkSize;
 			chunk->MinX = CurX;
+			//chunk->MinY = min.y;
 			chunk->MinZ = CurZ;
 			chunk->MaxX = CurX + ChunkSize;
+			//chunk->MaxY = max.y;
 			chunk->MaxZ = CurZ + ChunkSize;
-
+			chunk->TriangleSize = TriangleSize;
 			chunks.push_back(chunk);
 
 			CurZ += ChunkSize;
@@ -187,7 +189,7 @@ void Landscape::CreateEmptyChunks(glm::vec3& min, glm::vec3& max)
 	std::cout << "Generated " << chunks.size() << " Chunks" << '\n';
 }
 
-void Landscape::StartFillChunks()
+void LandscapeGenerator::StartFillChunks()
 {
 	for (auto chunk : chunks)
 	{
@@ -213,7 +215,7 @@ void Landscape::StartFillChunks()
 	std::vector<std::thread> threads;
 	for (int i = 0; i < threadCount; ++i)
 	{
-		threads.emplace_back(&Landscape::Thread_ChunkFill_worker, this);
+		threads.emplace_back(&LandscapeGenerator::Thread_ChunkFill_worker, this);
 	}
 
 	cv.notify_all();
@@ -229,7 +231,7 @@ void Landscape::StartFillChunks()
 	std::cout << "Done Filling Chunks" << '\n';
 }
 
-void Landscape::StartTriangulateChunks()
+void LandscapeGenerator::StartTriangulateChunks()
 {
 	for (auto chunk : chunks)
 	{
@@ -248,7 +250,7 @@ void Landscape::StartTriangulateChunks()
 	std::vector<std::thread> threads;
 	for (int i = 0; i < threadCount; ++i)
 	{
-		threads.emplace_back(&Landscape::Thread_ChunkTriangulate_worker, this);
+		threads.emplace_back(&LandscapeGenerator::Thread_ChunkTriangulate_worker, this);
 	}
 
 	cv.notify_all();
@@ -263,12 +265,31 @@ void Landscape::StartTriangulateChunks()
 
 	std::cout << "Done Triangulating Chunks" << '\n';
 
+
+	//Delete chunks without vertices
+	auto isEmpty = [](Chunk* chunk) {
+		return chunk->vertices.empty();
+		};
+
+	auto it = std::remove_if(chunks.begin(), chunks.end(), [&](Chunk* chunk) {
+		if (isEmpty(chunk))
+		{
+			delete chunk; // Free memory for the empty chunk
+			return true;  // Mark for removal from vector
+		}
+		return false; // Keep in the vector
+		});
+
+	// Erase removed elements from the vector
+	chunks.erase(it, chunks.end());
 }
 
-void Landscape::WriteChunksToFile()
+void LandscapeGenerator::WriteChunksToFile(std::filesystem::path inpath)
 {
+	std::string fileName = inpath.filename().string();
+
 	//Create new folder
-	std::filesystem::path outputFolder = "Landscape";
+	std::filesystem::path outputFolder = "LandscapeGenerator";
 
 	if (!std::filesystem::exists(outputFolder))
 		std::filesystem::create_directory(outputFolder);
@@ -276,7 +297,7 @@ void Landscape::WriteChunksToFile()
 	std::cout << "Writing Chunks to file: " << outputFolder << std::endl;
 
 	// Create new file in the folder
-	std::filesystem::path outputFilePath = outputFolder / "Landscape.txt";
+	std::filesystem::path outputFilePath = outputFolder / fileName;
 	std::ofstream outputFile(outputFilePath, std::ios::trunc);
 
 
@@ -291,7 +312,7 @@ void Landscape::WriteChunksToFile()
 	// Write the vertices to the file
 	for (auto chunk : chunks)
 	{
-		outputFile << chunk->MinX << " " << chunk->MinZ << " " << chunk->MaxX << " " << chunk->MaxZ << "\n";
+		outputFile << chunk->MinX << " " << chunk->MinY << " " << chunk->MinZ << " " << chunk->MaxX << " " << chunk->MaxY << " " << chunk->MaxZ << " " << chunk->chunkSize << " " << chunk->TriangleSize << " " << chunk->xCount << " " << chunk->zCount << "\n";
 		outputFile << chunk->verticesTriangulated.size() << "\n";
 		for (auto& vertex : chunk->verticesTriangulated)
 		{
@@ -313,11 +334,14 @@ void Landscape::WriteChunksToFile()
 	std::cout << "Done Writing Chunks to file" << '\n';
 }
 
-bool Landscape::ReadChunksFromFile()
+bool LandscapeGenerator::ReadChunksFromFile(std::filesystem::path inpath)
 {
+	//Get last part of inpath
+	std::string fileName = inpath.filename().string();
+
 	//OpenFile
-	std::filesystem::path outputFolder = "Landscape";
-	std::filesystem::path outputFilePath = outputFolder / "Landscape.txt";
+	std::filesystem::path outputFolder = "LandscapeGenerator";
+	std::filesystem::path outputFilePath = outputFolder / fileName;
 	std::ifstream outputFile(outputFilePath);
 
 	if (!outputFile.is_open())
@@ -344,7 +368,7 @@ bool Landscape::ReadChunksFromFile()
 		std::getline(outputFile, currentLine);
 
         std::stringstream ss(currentLine);
-        ss >> NewChunk->MinX >> NewChunk->MinZ >> NewChunk->MaxX >> NewChunk->MaxZ;
+		ss >> NewChunk->MinX >> NewChunk->MinY >> NewChunk->MinZ >> NewChunk->MaxX >> NewChunk->MaxY >> NewChunk->MaxZ >> NewChunk->chunkSize >> NewChunk->TriangleSize >> NewChunk->xCount >> NewChunk->zCount;
 
         int amountOfVertices = 0;
         std::getline(outputFile, currentLine);
@@ -384,7 +408,7 @@ bool Landscape::ReadChunksFromFile()
 	return true;
 }
 
-void Landscape::Thread_ChunkFill_worker()
+void LandscapeGenerator::Thread_ChunkFill_worker()
 {
 	//while (!chunkQueueInput.empty())
 	//{
@@ -438,7 +462,7 @@ void Landscape::Thread_ChunkFill_worker()
 	std::cout << "-";
 }
 
-void Landscape::FillChunksWithVertex(Chunk* inChunk)
+void LandscapeGenerator::FillChunksWithVertex(Chunk* inChunk)
 {
 	std::vector<Vertex> newVertices;
 	float Padding = TriangleSize * 1.5f;
@@ -459,7 +483,7 @@ void Landscape::FillChunksWithVertex(Chunk* inChunk)
 	
 }
 
-void Landscape::Thread_ChunkTriangulate_worker()
+void LandscapeGenerator::Thread_ChunkTriangulate_worker()
 {
 	while (true)
 	{
@@ -488,7 +512,7 @@ void Landscape::Thread_ChunkTriangulate_worker()
 	std::cout << "|";
 }
 
-void Landscape::TriangulateChunk(Chunk* inChunk)
+void LandscapeGenerator::TriangulateChunk(Chunk* inChunk)
 {
 	float CurX = inChunk->MinX;
 	float CurZ = inChunk->MinZ;
@@ -541,11 +565,16 @@ void Landscape::TriangulateChunk(Chunk* inChunk)
 			{
 				Height /= count;
 				Color /= count;
+
+				inChunk->MinY = glm::min(inChunk->MinY, Height);
+				inChunk->MaxY = glm::max(inChunk->MaxY, Height);
 			}
 			else
 			{
 				//std::cout << "|";
 				Height = -200;
+				inChunk->MinY = glm::min(inChunk->MinY, Height);
+				inChunk->MaxY = glm::max(inChunk->MaxY, Height);
 			}
 			
 			inChunk->verticesTriangulated.emplace_back(glm::vec3(CurX, Height, CurZ), glm::vec3(0, 1, 0), glm::vec2(0), Color);
@@ -579,7 +608,9 @@ void Landscape::TriangulateChunk(Chunk* inChunk)
 		
 		zCount /= xCount;
 	}
-
+	
+	inChunk->xCount = xCount;
+	inChunk->zCount = zCount;
 
 	// set up indices
 	inChunk->indices.reserve((xCount - 1) * (zCount - 1) * 6);
@@ -638,18 +669,18 @@ void Landscape::TriangulateChunk(Chunk* inChunk)
 	delete tempMesh;
 }
 
-bool Landscape::IsNumber(const std::string& s)
+bool LandscapeGenerator::IsNumber(const std::string& s)
 {
 	return !s.empty() && std::find_if(s.begin(),
 		s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
 
-void Landscape::Update()
+void LandscapeGenerator::Update()
 {
 	// TODO if needed
 }
 
-void Landscape::Render()
+void LandscapeGenerator::Render()
 {
 	for (auto chunk : chunks)
 	{
@@ -663,7 +694,7 @@ void Landscape::Render()
 	}
 }
 
-void Landscape::RenderChunk(Chunk* chunk)
+void LandscapeGenerator::RenderChunk(Chunk* chunk)
 {
 	glBindVertexArray(chunk->VAO);
 
@@ -679,7 +710,7 @@ void Landscape::RenderChunk(Chunk* chunk)
 	}
 }
 
-void Landscape::BindChunk(Chunk* chunk)
+void LandscapeGenerator::BindChunk(Chunk* chunk)
 {
 	// VAO
 	glGenBuffers(1, &chunk->VBO);

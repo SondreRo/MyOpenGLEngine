@@ -13,6 +13,7 @@ public:
 	std::vector<unsigned int> indices;
 
 	float chunkSize = 0;
+	float TriangleSize = 0;
 
 	float MinX = FLT_MAX;
 	float MinY = FLT_MAX;
@@ -22,12 +23,20 @@ public:
 	float MaxY = -FLT_MAX;
 	float MaxZ = -FLT_MAX;
 
+	int xCount;
+	int zCount;
 	
 	Material material;
 
 	unsigned int VAO, VBO, EBO;
 
+	float Friction = 0.0f;
 
 	bool isBound = false;
 	bool hide = false;
+
+	glm::vec3 GetCenter()
+	{
+		return glm::vec3((MinX + MaxX) / 2, (MinY + MaxY) / 2, (MinZ + MaxZ) / 2);
+	}
 };

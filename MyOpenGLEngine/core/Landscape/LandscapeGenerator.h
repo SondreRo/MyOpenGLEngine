@@ -7,7 +7,7 @@
 #include <mutex>
 #include <condition_variable>
 
-class Landscape {
+class LandscapeGenerator {
 
 public:
 	std::vector<Chunk*> chunks;
@@ -24,8 +24,8 @@ private:
 	void CreateEmptyChunks(glm::vec3& min, glm::vec3& max);
 	void StartFillChunks();
 	void StartTriangulateChunks();
-	void WriteChunksToFile();
-	bool ReadChunksFromFile();
+	void WriteChunksToFile(std::filesystem::path inpath);
+	bool ReadChunksFromFile(std::filesystem::path inpath);
 
 	// This function is only ran on the threads
 	void Thread_ChunkFill_worker();
@@ -46,7 +46,7 @@ private:
 	static std::queue<Chunk> chunkQueueOutput;
 
 	float ChunkSize = 20;
-	float TriangleSize = 0.5f;
+	float TriangleSize = 5.f;
 
 
 	std::condition_variable cv;

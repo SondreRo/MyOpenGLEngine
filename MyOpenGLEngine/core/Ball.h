@@ -15,6 +15,7 @@ public:
 	SphereCollider sphereCollider;
 	SphereCollider GetSphereCollider();
 
+	std::vector<Vertex> TracePoints;
 
 	void Resetball();
 

@@ -15,7 +15,8 @@
 #include <queue>
 
 #include "BSpline/BSplineSurface.h"
-#include "Landscape/Landscape.h"
+#include "Landscape/Landscapegenerator.h"
+#include "Landscape/LandscapeMesh.h"
 
 Scene::Scene(const std::string& name)
 {
@@ -67,9 +68,10 @@ void Scene::LoadContent()
 	RootMesh->Children.push_back(SunMesh);
 
 	lineMesh = new LineMesh("LineMesh");
-	lineMesh->shaderProgram = shaderProgram;
+	lineMesh->shaderProgram = lineShaderProgram;
 	RootMesh->Children.push_back(lineMesh);
 	lineMesh->AddLine(glm::vec3(-1, 0, 0), glm::vec3(1, 0, 0));
+	lineMesh->material.diffuse = glm::vec3(1.f, 0.f, 0.f);
 
 	Mesh* NodeTreeMesh = new Mesh("NodeTreeMesh");
 	Meshes["NodeTreeMesh"] = NodeTreeMesh;
@@ -115,9 +117,9 @@ void Scene::LoadContent()
 
 
 
-	Mesh* Landscape = CreateAndRegisterMesh<Mesh>("Landscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
-	//Mesh* LandscapeTriangulated = CreateAndRegisterMesh<Mesh>("LandscapeTriangulated", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, Landscape, true);
-	Landscape->Hide = true;
+	//Mesh* Landscape = CreateAndRegisterMesh<Mesh>("Landscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
+	////Mesh* LandscapeTriangulated = CreateAndRegisterMesh<Mesh>("LandscapeTriangulated", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, Landscape, true);
+	//Landscape->Hide = true;
 
 	//std::filesystem::path path = "../../../core/pointCloud.txt";
 	//std::filesystem::path path = "../../../core/vsim_las.txt";
@@ -126,37 +128,41 @@ void Scene::LoadContent()
 	//std::filesystem::path path = "C:/Users/soroe/Downloads/anders.txt";
 
 
-	std::vector<Mesh*> triangulatedChunks;
-	PunktSky* PunktSkyReader = new PunktSky();
+	/*std::vector<Mesh*> triangulatedChunks;
+	PunktSky* PunktSkyReader = new PunktSky();*/
 	//PunktSkyReader->ReadFileMesh(path, Landscape, triangulatedChunks, 20, 0.5f, true);
 
-	class Landscape newLandscape;
+	LandscapeGenerator newLandscape;
 	newLandscape.ReadPointCloudFile(path);
 
-	int Counter = 0;
-	for (auto chu : newLandscape.chunks)
-	{
-		Counter++;
-		std::string Name = "Chunk" + std::to_string(Counter);
-		Mesh* NewMesh = CreateAndRegisterMesh<Mesh>(Name, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0, 0, 0), glm::vec3(1.f), shaderProgram, nullptr, true);
-		NewMesh->vertices = chu->verticesTriangulated;
-		//NewMesh->vertices = chu->vertices;
-		NewMesh->indices = chu->indices;
-		NewMesh->VertexColorAsColor = true;
-		//NewMesh->renderDots = true;
-	}
+	LandscapeMesh* myLandscapeMesh = CreateAndRegisterMesh<LandscapeMesh>("MyLandscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
+	myLandscapeMesh->chunks = newLandscape.chunks;
+	myLandscapeMesh->VertexColorAsColor = true;
+	myLandscapeMesh->FillchunkMap();
+	//int Counter = 0;
+	//for (auto chu : newLandscape.chunks)
+	//{
+	//	Counter++;
+	//	std::string Name = "Chunk" + std::to_string(Counter);
+	//	Mesh* NewMesh = CreateAndRegisterMesh<Mesh>(Name, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0, 0, 0), glm::vec3(1.f), shaderProgram, nullptr, true);
+	//	NewMesh->vertices = chu->verticesTriangulated;
+	//	//NewMesh->vertices = chu->vertices;
+	//	NewMesh->indices = chu->indices;
+	//	NewMesh->VertexColorAsColor = true;
+	//	//NewMesh->renderDots = true;
+	//}
 
 
-	for (auto triangulated_chunk : triangulatedChunks)
-	{
-		triangulated_chunk->shaderProgram = shaderProgram;
-		triangulated_chunk->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
-		triangulated_chunk->material.specular = glm::vec3(0.2f, 0.2f, 0.2f);
-		triangulated_chunk->material.shininess = 64.f;
-		triangulated_chunk->useShading = false;
-		triangulated_chunk->Parent = Landscape;
-		Landscape->AddChild(triangulated_chunk);
-	}
+	//for (auto triangulated_chunk : triangulatedChunks)
+	//{
+	//	triangulated_chunk->shaderProgram = shaderProgram;
+	//	triangulated_chunk->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
+	//	triangulated_chunk->material.specular = glm::vec3(0.2f, 0.2f, 0.2f);
+	//	triangulated_chunk->material.shininess = 64.f;
+	//	triangulated_chunk->useShading = false;
+	//	triangulated_chunk->Parent = Landscape;
+	//	Landscape->AddChild(triangulated_chunk);
+	//}
 	//Landscape->vertices = punktSky.vertices;
 	//Landscape->renderDots = true;
 	//Landscape->VertexColorAsColor = true;
@@ -237,8 +243,21 @@ void Scene::LoadContent()
 	//{
 
 	//}
-	//Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(0, 1, 0), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(-148, 25, 84), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
+	MeshGenerator::GenerateIcosahedron(BallMesh, 3);
+	
+	//Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(-148, 25, 44), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
+	//MeshGenerator::GenerateIcosahedron(BallMesh2, 3);
+
+	//Ball* BallMesh3 = CreateAndRegisterMesh<Ball>("BallMesh3", glm::vec3(-128, 25, 94), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
+	//MeshGenerator::GenerateIcosahedron(BallMesh3, 3);
+
+	//Ball* BallMesh4 = CreateAndRegisterMesh<Ball>("BallMesh4", glm::vec3(-138, 25, 74), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
+	//MeshGenerator::GenerateIcosahedron(BallMesh4, 3);
+
+	//Mesh* BallMesh = CreateAndRegisterMesh<Mesh>("BallMesh", glm::vec3(0, 1, 0), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
 	//MeshGenerator::GenerateIcosahedron(BallMesh, 3);
+
 
 	//Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(4, 1, 0), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
 	//MeshGenerator::GenerateIcosahedron(BallMesh2, 3);
@@ -428,6 +447,68 @@ void Scene::Init()
 
 void Scene::Update(float DeltaTime)
 {
+
+	//LandscapeMesh* myLandscape = (LandscapeMesh*)Meshes["MyLandscape"];
+	//Chunk* myChunk = myLandscape->GetChunkFromPosition(camera->cameraPos);
+
+	//if(myChunk)
+	//{
+	//	glm::vec3 ChunkCenter = myChunk->GetCenter();
+	//	glm::vec3 Size = glm::vec3(myChunk->MinX - myChunk->MaxX);
+	//	
+	//	lineMesh->AddBoxMinMax({ myChunk->MinX, myChunk->MinY, myChunk->MinZ }, { myChunk->MaxX, myChunk->MaxY, myChunk->MaxZ });
+	//	Ball* BallMesh = (Ball*)Meshes["BallMesh"];
+	//	glm::vec3 BallPos = BallMesh->transform.GetLocation();
+
+
+	//	std::pair<bool, Triangle> Triangle = myLandscape->GetTriangleFromPosition(BallPos);
+	//	if (Triangle.first)
+	//	{
+	//		glm::vec3 RealPos = CollisionManager::BarycentricCheck(Triangle.second, BallPos);
+	//		lineMesh->AddLine(Triangle.second.vA.position, Triangle.second.vB.position);
+	//		lineMesh->AddLine(Triangle.second.vB.position, Triangle.second.vC.position);
+	//		lineMesh->AddLine(Triangle.second.vC.position, Triangle.second.vA.position);
+	//		//lineMesh->AddLine(RealPos, RealPos + glm::vec3(0, 10, 0));
+
+	//		glm::vec3 Normal = glm::normalize(glm::cross(Triangle.second.vB.position - Triangle.second.vA.position, Triangle.second.vC.position - Triangle.second.vA.position));
+	//		lineMesh->AddLine(RealPos, RealPos + Normal * 10.f);
+
+	//		Normal = glm::vec3(Normal.x, Normal.z, Normal.y);
+
+
+	//		glm::vec3 AccelerasjonsVector = 9.81f * glm::vec3(Normal.x * Normal.z, Normal.y * Normal.z, (Normal.z * Normal.z) - 1);
+	//		AccelerasjonsVector = glm::vec3(AccelerasjonsVector.x, AccelerasjonsVector.z, AccelerasjonsVector.y);
+	//		//AccelerasjonsVector.y = 0;
+	//		BallMesh->velocity = BallMesh->velocity + (AccelerasjonsVector * DeltaTime);
+	//		glm::vec3 NyPosition = BallMesh->transform.GetLocation() + (BallMesh->velocity * DeltaTime);
+	//		NyPosition.y = RealPos.y;
+	//		BallMesh->transform.SetLocation(NyPosition);
+	//		//std::cout << RealPos.x << " " << RealPos.y << " " << RealPos.z << "\n";
+	//		
+	//		//BallMesh->transform.SetLocation({ BallPos.x, RealPos.y, BallPos.z });
+	//		
+	//		//lineMesh->AddLine(Triangle.se, myLandscape->GetTriangleFromPosition(camera->cameraPos) + glm::vec3(0, 10, 0));
+
+	//	}
+	//	//lineMesh->AddLine(ChunkCenter, camera->cameraPos);
+	//	//lineMesh->AddLine(ChunkCenter, ChunkCenter + glm::vec3(0, 10, 0));
+	//	//lineMesh->AddLine({ myChunk->MinX, myChunk->MinY, myChunk->MinZ }, { myChunk->MaxX, myChunk->MinY, myChunk->MinZ });
+	//}
+	LandscapeMesh* myLandscape = (LandscapeMesh*)Meshes["MyLandscape"];
+
+	std::vector<Ball*> Balls;
+
+	for (auto mesh : Meshes)
+	{
+		if (mesh.second->name.find("BallMesh") != std::string::npos)
+		{
+			Ball* ball = (Ball*)mesh.second;
+			Balls.push_back(ball);
+		}
+	}
+
+	collision_manager->PhysicsUpdate(DeltaTime, myLandscape, Balls);
+
 	//lineMesh->AddLine(camera->cameraPos, Meshes["Landscape"]->transform.GetLocation());
 
 	while (MeshQueue.size() > 0)
@@ -452,7 +533,6 @@ void Scene::Update(float DeltaTime)
 
 void Scene::UpdateSceneGraph(float DeltaTime, Mesh* mesh, glm::mat4 ParentTransform)
 {
-
 	mesh->Update(DeltaTime);
 	mesh->ParentMatrix = ParentTransform;
 
@@ -706,6 +786,33 @@ void Scene::KeyCallback(Window* window, int key, int scancode, int action, int m
 {
 	camera->KeyCallback(window->GetGLFWWindow(), key, scancode, action, mods);
 	ecs_manager.KeyCallback(window, key, scancode, action, mods);
+
+	if (key == GLFW_KEY_T && action == GLFW_PRESS)
+	{
+		int size = Meshes.size();
+		std::string name = "BallMesh" + std::to_string(size);
+		Ball* BallMesh2 = CreateAndRegisterMesh<Ball>(name, camera->cameraPos, glm::vec3(0), glm::vec3(1), Shaders["DefaultShader"], nullptr, true);
+		MeshGenerator::GenerateIcosahedron(BallMesh2, 3);
+		BallMesh2->Bind();
+	}
+	if (key == GLFW_KEY_Y && action == GLFW_PRESS)
+	{
+		float OfsettSize = 10;
+		for (int i = 0; i < 10; ++i)
+		{
+			for (int y = 0; y < 10; ++y)
+			{
+				int size = Meshes.size();
+				std::string name = "BallMesh" + std::to_string(size);
+				Ball* BallMesh2 = CreateAndRegisterMesh<Ball>(name, camera->cameraPos + glm::vec3((OfsettSize * i) - (OfsettSize * 10)/2, 0, (OfsettSize * y) - (OfsettSize * 10)/2), glm::vec3(0), glm::vec3(1), Shaders["DefaultShader"], nullptr, true);
+				MeshGenerator::GenerateIcosahedron(BallMesh2, 3);
+				BallMesh2->Bind();
+			}
+		}
+
+
+	
+	}
 }
 
 void Scene::ProcessInput(Window* window, float DeltaTime)
