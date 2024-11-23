@@ -217,6 +217,41 @@ void MeshGenerator::GenerateCubeWithHardEdges(MeshBase* inMesh, glm::vec3 Size)
 	GetMeshCorners(inMesh);
 }
 
+void MeshGenerator::GeneratePlane(Mesh* inMesh, glm::vec3 Size)
+{
+	glm::vec3 v1 = { -0.5f * Size.x, 0.0f, -0.5f * Size.z };
+	glm::vec3 v2 = { 0.5f * Size.x, 0.0f, -0.5f * Size.z };
+	glm::vec3 v3 = { 0.5f * Size.x, 0.0f, 0.5f * Size.z };
+	glm::vec3 v4 = { -0.5f * Size.x, 0.0f, 0.5f * Size.z };
+
+	std::vector<Vertex> Vertices;
+	Vertices.emplace_back(v1, glm::vec3(0.0f, 1.0f, 0.0f));
+	Vertices.emplace_back(v2, glm::vec3(0.0f, 1.0f, 0.0f));
+	Vertices.emplace_back(v3, glm::vec3(0.0f, 1.0f, 0.0f));
+	Vertices.emplace_back(v4, glm::vec3(0.0f, 1.0f, 0.0f));
+
+	inMesh->vertices = Vertices;
+	inMesh->indices = {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	for (int i = 0; i < inMesh->indices.size(); i += 3)
+	{
+		Vertex ver1 = inMesh->vertices[inMesh->indices[i]];
+		Vertex ver2 = inMesh->vertices[inMesh->indices[i + 1]];
+		Vertex ver3 = inMesh->vertices[inMesh->indices[i + 2]];
+
+		glm::vec3 Normal = GetNormal(ver1.position, ver2.position, ver3.position);
+
+		inMesh->vertices[inMesh->indices[i]].normal = Normal;
+		inMesh->vertices[inMesh->indices[i + 1]].normal = Normal;
+		inMesh->vertices[inMesh->indices[i + 2]].normal = Normal;
+	}
+
+	std::cout << "Generated Plane" << std::endl;
+}
+
 void MeshGenerator::GenerateSphere(Mesh* inMesh, float Radius, int Sectors, int Stacks)
 {
 

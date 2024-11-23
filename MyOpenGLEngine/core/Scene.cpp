@@ -83,7 +83,21 @@ void Scene::LoadContent()
 
 
 
+	Mesh* FloorMesh = CreateAndRegisterMesh<Mesh>("FloorMesh", { 0,0,0 }, { 0,0,0 }, { 1,1,1 }, shaderProgram, nullptr, false);
+	MeshGenerator::GeneratePlane(FloorMesh, { 50,0,50 });
+	FloorMesh->material.diffuse = glm::vec3(0.2f, 0.5f, 0.2f);
 
+	// -------------- Create Particle System and Particle Mesh -------------- //
+	Mesh* ParticleMesh = new Mesh("ParticleMesh");
+	MeshGenerator::GenerateCubeWithHardEdges(ParticleMesh, { 0.2,0.2 ,0.2 });
+	ParticleMesh->shaderProgram = shaderProgram;
+	ParticleMesh->material.diffuse = glm::vec3(1.f, 1.f, 1.f);
+	Meshes["ParticleMesh"] = ParticleMesh;
+
+	particleSystem = new ParticleSystem;
+	particleSystem->ParticleMesh = ParticleMesh;
+
+	particleSystem->GenerateStartingParticles(800);
 
 
 	//Mesh* BigBoxMesh = CreateAndRegisterMesh<Mesh>("BigBoxMesh", glm::vec3(-7.f, 7, 0), glm::vec3(0.f), glm::vec3(1.f), shaderProgram, nullptr, true);
@@ -124,21 +138,21 @@ void Scene::LoadContent()
 	//std::filesystem::path path = "../../../core/pointCloud.txt";
 	//std::filesystem::path path = "../../../core/vsim_las.txt";
 	//std::filesystem::path path = "C:/Users/soroe/Downloads/CroppedCloud.txt";
-	std::filesystem::path path = "C:/Users/soroe/Downloads/Leira.txt";
-	//std::filesystem::path path = "C:/Users/soroe/Downloads/anders.txt";
+	//std::filesystem::path path = "C:/Users/soroe/Downloads/Leira.txt";
+	////std::filesystem::path path = "C:/Users/soroe/Downloads/anders.txt";
 
 
-	/*std::vector<Mesh*> triangulatedChunks;
-	PunktSky* PunktSkyReader = new PunktSky();*/
-	//PunktSkyReader->ReadFileMesh(path, Landscape, triangulatedChunks, 20, 0.5f, true);
+	///*std::vector<Mesh*> triangulatedChunks;
+	//PunktSky* PunktSkyReader = new PunktSky();*/
+	////PunktSkyReader->ReadFileMesh(path, Landscape, triangulatedChunks, 20, 0.5f, true);
 
-	LandscapeGenerator newLandscape;
-	newLandscape.ReadPointCloudFile(path);
+	//LandscapeGenerator newLandscape;
+	//newLandscape.ReadPointCloudFile(path);
 
-	LandscapeMesh* myLandscapeMesh = CreateAndRegisterMesh<LandscapeMesh>("MyLandscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, false);
-	myLandscapeMesh->chunks = newLandscape.chunks;
-	myLandscapeMesh->VertexColorAsColor = true;
-	myLandscapeMesh->FillchunkMap();
+	//LandscapeMesh* myLandscapeMesh = CreateAndRegisterMesh<LandscapeMesh>("MyLandscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, false);
+	//myLandscapeMesh->chunks = newLandscape.chunks;
+	//myLandscapeMesh->VertexColorAsColor = true;
+	//myLandscapeMesh->FillchunkMap();
 
 	//LandscapeGenerator newLandscape2;
 	//newLandscape2.ReadPointCloudFile(path2);
@@ -177,15 +191,15 @@ void Scene::LoadContent()
 
 
 	// -------------------  BSPLINE SURFACE ------------------- //
-	Mesh* BSplineMesh = CreateAndRegisterMesh<Mesh>("BSplineMesh", glm::vec3(0.f, 5.f, 0.f), glm::vec3(0,180,0), glm::vec3(1.f), shaderProgram, nullptr, false);
-	Mesh* BSplineControlMesh = CreateAndRegisterMesh<Mesh>("BSplineControlMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, BSplineMesh, false);
-	BSplineControlMesh->renderDots = true;
+	//Mesh* BSplineMesh = CreateAndRegisterMesh<Mesh>("BSplineMesh", glm::vec3(0.f, 5.f, 0.f), glm::vec3(0,180,0), glm::vec3(1.f), shaderProgram, nullptr, false);
+	//Mesh* BSplineControlMesh = CreateAndRegisterMesh<Mesh>("BSplineControlMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, BSplineMesh, false);
+	//BSplineControlMesh->renderDots = true;
 
-	std::vector<std::vector<glm::vec3>> controlPoints = {
-	   { glm::vec3(0, 0, 0), glm::vec3(1, 0, 1), glm::vec3(2, 0, 0) },
-	   { glm::vec3(0, 1, 1), glm::vec3(1, 1, 2), glm::vec3(2, 1, 1) },
-	   { glm::vec3(0, 2, 0), glm::vec3(1, 2, 1), glm::vec3(2, 2, 0) }
-	};
+	//std::vector<std::vector<glm::vec3>> controlPoints = {
+	//   { glm::vec3(0, 0, 0), glm::vec3(1, 0, 1), glm::vec3(2, 0, 0) },
+	//   { glm::vec3(0, 1, 1), glm::vec3(1, 1, 2), glm::vec3(2, 1, 1) },
+	//   { glm::vec3(0, 2, 0), glm::vec3(1, 2, 1), glm::vec3(2, 2, 0) }
+	//};
 
 	//controlPoints = {
 	//	{glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(2.0, 0.0, 0.0), glm::vec3(3.0, 0.0, 0.0)},
@@ -206,7 +220,7 @@ void Scene::LoadContent()
 	//};
 
 
-	for (auto& control_point : controlPoints)
+	/*for (auto& control_point : controlPoints)
 	{
 		for (auto& point : control_point)
 		{
@@ -221,39 +235,39 @@ void Scene::LoadContent()
 		{
 			BSplineControlMesh->vertices.emplace_back(point);
 		}
-	}
+	//}*/
 
 
-	int resolutionU = 10;  // Resolution along the u direction
-	int resolutionV = 10;  // Resolution along the v direction
+	//int resolutionU = 10;  // Resolution along the u direction
+	//int resolutionV = 10;  // Resolution along the v direction
 
-	// Generate vertices for the B-spline surface
-	std::vector<glm::vec3> vertices = BSplineSurface::generateBSplineMesh(controlPoints, resolutionU, resolutionV);
+	//// Generate vertices for the B-spline surface
+	//std::vector<glm::vec3> vertices = BSplineSurface::generateBSplineMesh(controlPoints, resolutionU, resolutionV);
 
-	// Generate the triangle indices for the surface
-	std::vector<unsigned int> indices = BSplineSurface::triangulate(resolutionU, resolutionV);
+	//// Generate the triangle indices for the surface
+	//std::vector<unsigned int> indices = BSplineSurface::triangulate(resolutionU, resolutionV);
 
-	for (auto& vertex : vertices)
-	{
-		BSplineMesh->vertices.emplace_back(vertex);
-	}
+	//for (auto& vertex : vertices)
+	//{
+	//	BSplineMesh->vertices.emplace_back(vertex);
+	//}
 
-	BSplineMesh->indices = indices;
+	//BSplineMesh->indices = indices;
 
-	MeshGenerator::GenerateNormals(BSplineMesh);
+	//MeshGenerator::GenerateNormals(BSplineMesh);
 
 
-	Mesh* NewMesh = CreateAndRegisterMesh<Mesh>("NewMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, false);
+	/*Mesh* NewMesh = CreateAndRegisterMesh<Mesh>("NewMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, false);
 
-	MeshGenerator::GenerateSphere(NewMesh, 10, 10, 10);
+	MeshGenerator::GenerateSphere(NewMesh, 10, 10, 10);*/
 
 	//for (int i = 0; i < 10; ++i)
 	//{
 
 	//}
-	Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(-148, 25, 84), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
-	MeshGenerator::GenerateIcosahedron(BallMesh, 3);
-	
+	//Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(-148, 25, 84), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	//MeshGenerator::GenerateIcosahedron(BallMesh, 3);
+	//
 	//Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(-148, 25, 44), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
 	//MeshGenerator::GenerateIcosahedron(BallMesh2, 3);
 
@@ -502,20 +516,33 @@ void Scene::Update(float DeltaTime)
 	//	//lineMesh->AddLine(ChunkCenter, ChunkCenter + glm::vec3(0, 10, 0));
 	//	//lineMesh->AddLine({ myChunk->MinX, myChunk->MinY, myChunk->MinZ }, { myChunk->MaxX, myChunk->MinY, myChunk->MinZ });
 	//}
-	LandscapeMesh* myLandscape = (LandscapeMesh*)Meshes["MyLandscape"];
-
-	std::vector<Ball*> Balls;
-
-	for (auto mesh : Meshes)
+	if (particleSystem)
 	{
-		if (mesh.second->name.find("BallMesh") != std::string::npos)
+		particleSystem->Update(DeltaTime);
+	}
+	
+
+	LandscapeMesh* myLandscape = nullptr;
+	if (Meshes.count("MyLandscape") != 0)
+	{
+		myLandscape = (LandscapeMesh*)Meshes["MyLandscape"];
+
+		std::vector<Ball*> Balls;
+
+		for (auto mesh : Meshes)
 		{
-			Ball* ball = (Ball*)mesh.second;
-			Balls.push_back(ball);
+			if (mesh.second->name.find("BallMesh") != std::string::npos)
+			{
+				Ball* ball = (Ball*)mesh.second;
+				Balls.push_back(ball);
+			}
 		}
+
+		collision_manager->PhysicsUpdate(DeltaTime, myLandscape, Balls);
 	}
 
-	collision_manager->PhysicsUpdate(DeltaTime, myLandscape, Balls);
+
+
 
 	//lineMesh->AddLine(camera->cameraPos, Meshes["Landscape"]->transform.GetLocation());
 
@@ -558,7 +585,11 @@ void Scene::Render(float DeltaTime, int width, int height)
 {
 	//start timer
 	//StartTimer("Render");
-
+	if (particleSystem)
+	{
+		particleSystem->Draw();
+		particleSystem->DrawDebugMenu();
+	}
 
 	//std::cout << "Rendering Scene" << std::endl;
 	// SceneGraph

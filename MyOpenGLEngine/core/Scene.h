@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 #include "ECS/ECSManager.h"
-
+#include "ParticleSystem/ParticleSystem.h"
 
 
 class Window;
@@ -54,6 +54,8 @@ public:
 	Camera* camera;
 
 	LineMesh* lineMesh;
+
+	ParticleSystem* particleSystem;
 
 	Mesh* RootMesh;
 	Mesh* SunMesh;

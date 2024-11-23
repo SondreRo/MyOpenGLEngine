@@ -21,6 +21,8 @@ public:
 	static void GenerateCubeWithHardEdges(Mesh* inMesh, glm::vec3 Size);
 	static void GenerateCubeWithHardEdges(MeshBase* inMesh, glm::vec3 Size);
 
+	static void GeneratePlane(Mesh* inMesh, glm::vec3 Size);
+
 	static void GenerateSphere(Mesh* inMesh, float Radius, int Sectors, int Stacks);
 	static void GenerateIcosahedron(Mesh* inMesh, int n);
 
