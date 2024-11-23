@@ -4,7 +4,7 @@
 #include "Timer.h"
 #include "Ball.h"
 #include "Application.h"
-#include "imgui_internal.h"
+#include "BSpline/BSpline.h"
 
 void CollisionManager::BruteForceCollisionChecks()
 {
@@ -265,6 +265,7 @@ void CollisionManager::CollisionCheckDag(Ball* b1, Ball* b2, float dt)
 void CollisionManager::PhysicsUpdate(float DeltaTime, LandscapeMesh* landscape, std::vector<Ball*> balls)
 {
 
+
 	ImGui::Begin("Physics");
 
     std::string amount = "Balls" + std::to_string(balls.size());
@@ -323,6 +324,8 @@ void CollisionManager::PhysicsUpdate(float DeltaTime, LandscapeMesh* landscape, 
 
 		if (RenderLines)
 		{
+			//std::vector<Vertex> NewLinePoints = BSpline::GenerateBSplineCurve(ball->TracePoints, 4, 100);
+
 			for (int i = 0; i < ball->TracePoints.size(); i++)
 			{
 				if (i + 1 < ball->TracePoints.size())

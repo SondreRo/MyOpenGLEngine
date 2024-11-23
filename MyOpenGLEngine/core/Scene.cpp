@@ -135,10 +135,18 @@ void Scene::LoadContent()
 	LandscapeGenerator newLandscape;
 	newLandscape.ReadPointCloudFile(path);
 
-	LandscapeMesh* myLandscapeMesh = CreateAndRegisterMesh<LandscapeMesh>("MyLandscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
+	LandscapeMesh* myLandscapeMesh = CreateAndRegisterMesh<LandscapeMesh>("MyLandscape", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, false);
 	myLandscapeMesh->chunks = newLandscape.chunks;
 	myLandscapeMesh->VertexColorAsColor = true;
 	myLandscapeMesh->FillchunkMap();
+
+	//LandscapeGenerator newLandscape2;
+	//newLandscape2.ReadPointCloudFile(path2);
+
+	//LandscapeMesh* myLandscapeMesh2 = CreateAndRegisterMesh<LandscapeMesh>("MyLandscape2", glm::vec3(300.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, false);
+	//myLandscapeMesh2->chunks = newLandscape2.chunks;
+	//myLandscapeMesh2->VertexColorAsColor = true;
+	//myLandscapeMesh2->FillchunkMap();
 	//int Counter = 0;
 	//for (auto chu : newLandscape.chunks)
 	//{
@@ -169,8 +177,8 @@ void Scene::LoadContent()
 
 
 	// -------------------  BSPLINE SURFACE ------------------- //
-	Mesh* BSplineMesh = CreateAndRegisterMesh<Mesh>("BSplineMesh", glm::vec3(0.f, 5.f, 0.f), glm::vec3(0,180,0), glm::vec3(1.f), shaderProgram, nullptr, true);
-	Mesh* BSplineControlMesh = CreateAndRegisterMesh<Mesh>("BSplineControlMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, BSplineMesh, true);
+	Mesh* BSplineMesh = CreateAndRegisterMesh<Mesh>("BSplineMesh", glm::vec3(0.f, 5.f, 0.f), glm::vec3(0,180,0), glm::vec3(1.f), shaderProgram, nullptr, false);
+	Mesh* BSplineControlMesh = CreateAndRegisterMesh<Mesh>("BSplineControlMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, BSplineMesh, false);
 	BSplineControlMesh->renderDots = true;
 
 	std::vector<std::vector<glm::vec3>> controlPoints = {
@@ -235,7 +243,7 @@ void Scene::LoadContent()
 	MeshGenerator::GenerateNormals(BSplineMesh);
 
 
-	Mesh* NewMesh = CreateAndRegisterMesh<Mesh>("NewMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, true);
+	Mesh* NewMesh = CreateAndRegisterMesh<Mesh>("NewMesh", glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f), glm::vec3(1.f, 1.f, 1.f), shaderProgram, nullptr, false);
 
 	MeshGenerator::GenerateSphere(NewMesh, 10, 10, 10);
 
@@ -243,7 +251,7 @@ void Scene::LoadContent()
 	//{
 
 	//}
-	Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(-148, 25, 84), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
+	Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(-148, 25, 84), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
 	MeshGenerator::GenerateIcosahedron(BallMesh, 3);
 	
 	//Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(-148, 25, 44), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
