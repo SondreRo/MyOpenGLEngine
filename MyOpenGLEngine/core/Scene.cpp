@@ -97,7 +97,8 @@ void Scene::LoadContent()
 	particleSystem = new ParticleSystem;
 	particleSystem->ParticleMesh = ParticleMesh;
 
-	particleSystem->GenerateStartingParticles(800);
+	particleSystem->GenerateStartingParticles(1);
+	particleSystem->MaxParticles = 20;
 
 
 	//Mesh* BigBoxMesh = CreateAndRegisterMesh<Mesh>("BigBoxMesh", glm::vec3(-7.f, 7, 0), glm::vec3(0.f), glm::vec3(1.f), shaderProgram, nullptr, true);
@@ -433,8 +434,8 @@ void Scene::LoadContent()
 
 	//RootMesh->AddChild.push_back(FloorMesh);
 
-	//ecs_manager.Setup();
-	//ecs_manager.SystemSetup();
+	ecs_manager.Setup();
+	ecs_manager.SystemSetup();
 }
 
 void Scene::UnloadContent()
@@ -561,7 +562,7 @@ void Scene::Update(float DeltaTime)
 	//std::cout << "Updating Scene" << std::endl;
 	UpdateSceneGraph(DeltaTime, RootMesh, glm::mat4(1));
 	collision_manager->Update(DeltaTime);
-	//ecs_manager.Update(DeltaTime);
+	ecs_manager.Update(DeltaTime);
 		//end timer
 	//EndTimer("Update");
 }
@@ -601,7 +602,7 @@ void Scene::Render(float DeltaTime, int width, int height)
 	//collision_manager->Render(lineMesh);
 	//lineMesh->AddLine(glm::vec3(0, 0, 0), glm::vec3(10, 5, 2));
 
-	//ecs_manager.Render();
+	ecs_manager.Render();
 	//punktSky.Draw();
 
 

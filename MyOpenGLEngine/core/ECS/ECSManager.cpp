@@ -6,11 +6,13 @@
 #include "Components/MeshComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SphereColliderComponent.h"
 
 // Systems
 #include "Systems/MovementSystem.h"
 #include "Systems/RenderSystem.h"
 #include "Systems/AICombatSystem.h"
+#include "Systems/CollisionSystem.h"
 
 // Extra
 #include "Application.h"
@@ -33,24 +35,28 @@ void ECSManager::Setup()
 	BoxMesh->material.diffuse = glm::vec3(1, 0, 0);
 
 
-	MeshBase* PlayerMesh = new MeshBase();
+	/*MeshBase* PlayerMesh = new MeshBase();
 	MeshGenerator::GenerateCubeWithHardEdges(PlayerMesh, glm::vec3(2.f));
 	PlayerMesh->shaderProgram = newShader;
-	PlayerMesh->material.diffuse = glm::vec3(0, 0, 1);
+	PlayerMesh->material.diffuse = glm::vec3(0, 0, 1);*/
 
-	// Create Entities
-	Entity* Player = CreateEntity();
-	Player->AddComponent<TransformComponent>(new TransformComponent(glm::vec3(0, 1, -50)));
-	Player->AddComponent<VelocityComponent>(new VelocityComponent(glm::vec3(0, 0, 0)));
-	Player->AddComponent<MeshComponent>(new MeshComponent(PlayerMesh));
-	Player->AddComponent<InputComponent>(new InputComponent());
-	Player->AddComponent<CombatComponent>(new CombatComponent(100, 10, nullptr));
+	//// Create Entities
+	//Entity* Player = CreateEntity();
+	//Player->AddComponent<TransformComponent>(new TransformComponent(glm::vec3(0, 1, -50)));
+	//Player->AddComponent<VelocityComponent>(new VelocityComponent(glm::vec3(0, 0, 0)));
+	//Player->AddComponent<MeshComponent>(new MeshComponent(PlayerMesh));
+	//Player->AddComponent<InputComponent>(new InputComponent());
+	//Player->AddComponent<CombatComponent>(new CombatComponent(100, 10, nullptr));
 
 
 
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 100; i++)
 	{
-		CreateEnemy(glm::vec3(rand() % 100 - 50, 1, (rand() % 100 - 50) + 50));
+		// Random float between -50 and 50
+		float RandX = rand() % 100 - 50;
+		float RandZ = rand() % 100 - 50;
+
+		CreateEnemy({RandX, 1, RandZ});
 		
 	}
   
@@ -64,6 +70,7 @@ void ECSManager::SystemSetup()
 	Systems.emplace_back(new MovementSystem());
 	Systems.emplace_back(new RenderSystem());
 	Systems.emplace_back(new AICombatSystem());
+	Systems.emplace_back(new CollisionSystem());
 
 
 	for (auto& system : Systems)
@@ -132,9 +139,14 @@ void ECSManager::CreateEnemy(glm::vec3 Position)
 	float RandVelX = (rand() % 10 - 5) / 10.f;
 	float RandVelZ = (rand() % 10 - 5) / 10.f;
 
+	RandVelX *= 10;
+	RandVelZ *= 10;
+
+
 	E1->AddComponent<VelocityComponent>(new VelocityComponent(glm::vec3(RandVelX, 0, RandVelZ)));
 	E1->AddComponent<MeshComponent>(new MeshComponent(BoxMesh));
-	E1->AddComponent<CombatComponent>(new CombatComponent(100, 10, Entities[0]));
+	E1->AddComponent<SphereColliderComponent>(new SphereColliderComponent(0.5f));
+	//E1->AddComponent<CombatComponent>(new CombatComponent(100, 10, Entities[0]));
 
 }
 

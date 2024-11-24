@@ -23,7 +23,8 @@ public:
 			if (VelocityComponent* VC = entity->GetComponent<VelocityComponent>())
 			{
 				TC->transform.AddLocation(VC->Velocity * DeltaTime);
-				VC->Velocity *= 1 - (3 * DeltaTime);
+				//VC->Velocity *= 1 - (1 * DeltaTime);
+				//std::cout << "Velocity: " << VC->Velocity.x << ", " << VC->Velocity.y << ", " << VC->Velocity.z << std::endl;
 			}
 		}
 	}

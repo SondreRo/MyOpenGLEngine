@@ -2,9 +2,9 @@
 
 #include "SystemBase.h"
 
+#include "../Components/CombatComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/VelocityComponent.h"
-#include "../Components/CombatComponent.h"
 
 
 #include "ECSManager.h"
@@ -44,16 +44,16 @@ public:
 								}
 							}
 
-							//// Random float between -1 and 1
-							//float RandX = (rand() % 20 - 10) / 10.f;
-							//float RandZ = (rand() % 20 - 10) / 10.f;
+							// Random float between -1 and 1
+							float RandX = (rand() % 20 - 10) / 10.f;
+							float RandZ = (rand() % 20 - 10) / 10.f;
 
-							//RandX *= 2;
-							//RandZ *= 2;
-							//
+							RandX *= 2;
+							RandZ *= 2;
+							
 
-							//VC->Velocity.x += RandX;
-							//VC->Velocity.z += RandZ;
+							VC->Velocity.x += RandX;
+							VC->Velocity.z += RandZ;
 						}
 					}
 				}
