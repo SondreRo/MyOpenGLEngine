@@ -317,6 +317,8 @@ void CollisionManager::PhysicsUpdate(float DeltaTime, LandscapeMesh* landscape, 
 					NewPoint.normal = NewPoint.color;
 					ball->TracePoints.emplace_back(NewPoint);
 
+
+				
 				}
 			}
 		}
@@ -324,19 +326,35 @@ void CollisionManager::PhysicsUpdate(float DeltaTime, LandscapeMesh* landscape, 
 
 		if (RenderLines)
 		{
+			if (BTimer)
+			{
+				std::vector<glm::vec3> ControlPoints = {};
+				for (auto trace_point : ball->TracePoints)
+				{
+					ControlPoints.push_back(trace_point.position);
+				}
+				std::vector<float> knots = {};
+				ball->LinePoints = BSpline::GeneratePoints(ControlPoints, knots, 500);
+			}
 			//std::vector<Vertex> NewLinePoints = BSpline::GenerateBSplineCurve(ball->TracePoints, 4, 100);
 
-			for (int i = 0; i < ball->TracePoints.size(); i++)
+			if (ball->LinePoints.size() > 3)
 			{
-				if (i + 1 < ball->TracePoints.size())
+				for (int i = 0; i < ball->LinePoints.size(); i++)
 				{
-					Application::get().mScene.lineMesh->AddLine(ball->TracePoints[i], ball->TracePoints[i + 1]);
-				}
-				else
-				{
-					Application::get().mScene.lineMesh->AddLine(ball->TracePoints[i], ball->transform.GetLocation());
+					if (i + 1 < ball->LinePoints.size())
+					{
+						Application::get().mScene.lineMesh->AddLine(ball->LinePoints[i], ball->LinePoints[i + 1]);
+					}
+					else
+					{
+						Application::get().mScene.lineMesh->AddLine(ball->LinePoints[i], ball->transform.GetLocation());
+					}
 				}
 			}
+				
+
+		
 		}
 		
 		if (!FreezeUpdates)
@@ -387,7 +405,24 @@ void CollisionManager::UpdateBall(Ball* ball, float DeltaTime, LandscapeMesh* la
 	ball->velocity += acceleration * DeltaTime;
 
 	glm::vec3 newPosition = ball->transform.GetLocation() + (ball->velocity * DeltaTime);
-	newPosition.y = realPosition.y + ball->Radius;
+
+	if (ballPosition.y - ball->Radius <= realPosition.y)
+	{
+		newPosition.y = realPosition.y + ball->Radius;
+		ball->velocity.y = 0.0f;
+
+	}
+	else if (ballPosition.y - 1 > realPosition.y)
+	{
+		ball->velocity.y -= 9.81f * DeltaTime; // Gravity
+
+	}
+	
+	//{
+	//	ball->velocity.y = 0.0f;
+	//	newPosition.y = 0.0f + ball->Radius;
+	//}
+
 
 	ball->transform.SetLocation(newPosition);
 

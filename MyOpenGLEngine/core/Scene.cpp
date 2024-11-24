@@ -14,6 +14,7 @@
 #include <iostream>
 #include <queue>
 
+#include "BSpline/BSpline.h"
 #include "BSpline/BSplineSurface.h"
 #include "Landscape/Landscapegenerator.h"
 #include "Landscape/LandscapeMesh.h"
@@ -251,7 +252,7 @@ void Scene::LoadContent()
 	//{
 
 	//}
-	Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(-148, 25, 84), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	Ball* BallMesh = CreateAndRegisterMesh<Ball>("BallMesh", glm::vec3(-150, 25, 90), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
 	MeshGenerator::GenerateIcosahedron(BallMesh, 3);
 	
 	//Ball* BallMesh2 = CreateAndRegisterMesh<Ball>("BallMesh2", glm::vec3(-148, 25, 44), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, false);
@@ -421,6 +422,41 @@ void Scene::LoadContent()
 
 	//ecs_manager.Setup();
 	//ecs_manager.SystemSetup();
+
+	int Degree = 3;
+	//std::vector<float> knots = { 0.0f, 0.0f, 0.0f, 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f };
+	std::vector<float> knots = {};
+
+	std::vector<glm::vec3> control_points = {
+	glm::vec3(0.0f, 0.0f, 0.0f),
+	glm::vec3(1.0f, 5.0f, 0.0f),
+	glm::vec3(2.0f, 4.0f, 5.0f),
+	glm::vec3(3.0f, 0.0f, 0.0f),
+	glm::vec3(4.0f, 1.0f, 0.0f),
+	glm::vec3(5.0f, -1.0f, 0.0f),
+	glm::vec3(6.0f, 0.0f, 0.0f),
+	glm::vec3(10.0f, 5.0f, -5.0f)
+	};
+
+	std::vector<glm::vec3> Points = BSpline::GeneratePoints(control_points, knots, 1000);
+	Mesh* PointMesh = CreateAndRegisterMesh<Mesh>("PointMesh", glm::vec3(0, 0, 0), glm::vec3(0), glm::vec3(1), shaderProgram, nullptr, true);
+	Mesh* PointMesh2 = CreateAndRegisterMesh<Mesh>("PointMesh2", glm::vec3(0, 0, 0), glm::vec3(0), glm::vec3(1), shaderProgram, PointMesh, true);
+	for (auto paths : control_points)
+	{
+		PointMesh2->vertices.emplace_back(paths);
+	}
+	PointMesh->renderDots = true;
+	PointMesh2->renderDots = true;
+	PointMesh->DotsSize = 10;
+	PointMesh2->DotsSize = 10;
+	PointMesh2->material.diffuse = glm::vec3(1.f, 0.f, 0.f);
+
+	for (auto point : Points)
+	{
+		std::cout << point.x << " " << point.y << " " << point.z << std::endl;
+		PointMesh->vertices.emplace_back(point);
+	}
+
 }
 
 void Scene::UnloadContent()

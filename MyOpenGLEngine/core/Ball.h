@@ -15,6 +15,8 @@ public:
 	SphereCollider sphereCollider;
 	SphereCollider GetSphereCollider();
 
+
+	std::vector<glm::vec3> LinePoints;
 	std::vector<Vertex> TracePoints;
 
 	void Resetball();
