@@ -39,7 +39,6 @@ void ParticleSystem::Update(float deltaTime)
 {
 		
 	Timer += deltaTime;
-	
 
 	for (unsigned int i = 0; i < ParticleCount; i++)
 	{
@@ -66,10 +65,6 @@ void ParticleSystem::Update(float deltaTime)
 			}
 		}
 	}
-
-	
-
-
 }
 
 void ParticleSystem::Draw()
@@ -101,7 +96,6 @@ void ParticleSystem::GenerateStartingParticles(int Amount)
 	for (int i = 0; i < Amount; i++)
 	{
 		SpawnSnowParticle();
-
 	}
 }
 
