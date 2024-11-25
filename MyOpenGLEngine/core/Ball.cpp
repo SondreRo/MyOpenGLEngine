@@ -66,6 +66,12 @@ void Ball::Update(float DeltaTime)
 	//	Resetball();
 
 	//}
+
+	if (FirstUpdate)
+	{
+		FirstUpdate = false;
+		SpawnLocation = transform.GetLocation();
+	}
 }
 
 void Ball::RenderProperties()
@@ -103,6 +109,6 @@ SphereCollider Ball::GetSphereCollider()
 
 void Ball::Resetball()
 {
-		transform.SetLocation(glm::vec3(0,2,0));
-		velocity = glm::vec3(rand() % 10 - 5, rand() % 10 - 5, rand() % 10 - 5);
+		transform.SetLocation(SpawnLocation);
+		velocity = glm::vec3(0);
 }

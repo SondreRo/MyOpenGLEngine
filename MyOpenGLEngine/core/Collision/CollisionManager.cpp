@@ -285,6 +285,7 @@ void CollisionManager::PhysicsUpdate(float DeltaTime, LandscapeMesh* landscape, 
 
 	ImGui::Checkbox("CheckBallCollision", &CheckCollision);
 	ImGui::Checkbox("FreezeUpdates", &FreezeUpdates);
+	ImGui::Checkbox("ResetBalls", &ResetBalls);
 	ImGui::End();
 
 	if (!FreezeUpdates)
@@ -334,7 +335,7 @@ void CollisionManager::PhysicsUpdate(float DeltaTime, LandscapeMesh* landscape, 
 					ControlPoints.push_back(trace_point.position);
 				}
 				std::vector<float> knots = {};
-				ball->LinePoints = BSpline::GeneratePoints(ControlPoints, knots, 500);
+				ball->LinePoints = BSpline::GeneratePoints(ControlPoints, knots, 150);
 			}
 			//std::vector<Vertex> NewLinePoints = BSpline::GenerateBSplineCurve(ball->TracePoints, 4, 100);
 
@@ -368,10 +369,33 @@ void CollisionManager::UpdateBall(Ball* ball, float DeltaTime, LandscapeMesh* la
 
 	glm::vec3 ballPosition = ball->transform.GetLocation();
 	Chunk* chunk = landscape->GetChunkFromPosition(ballPosition);
-	if (!chunk) return;
+	if (!chunk)
+	{
+
+		if (ResetBalls)
+			ball->Resetball();
+
+		return;
+	} 
+
 
 	auto triangleResult = landscape->GetTriangleFromPosition(ballPosition);
-	if (!triangleResult.first) return;
+	if (!triangleResult.first)
+	{
+
+		if (ResetBalls)
+		{
+			//Random float between -0,5 and 0,5
+			float RandomFloatX = (rand() % 100) / 100.0f - 0.5f;
+			float RandomFloatY = (rand() % 100) / 100.0f - 0.5f;
+			float RandomFloatZ = (rand() % 100) / 100.0f - 0.5f;
+
+			ball->SpawnLocation += glm::vec3(RandomFloatX, RandomFloatY, RandomFloatZ);
+			ball->Resetball();
+		}
+		
+		return;
+	}
 
 	const Triangle& triangle = triangleResult.second;
 

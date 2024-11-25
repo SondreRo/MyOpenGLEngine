@@ -38,6 +38,7 @@ public:
 	bool CheckCollision = true;
 	bool FreezeUpdates = false;
 	float Timer;
+	bool ResetBalls = false;
 
 	// Returns the height of the triangle at a given position
 	static glm::vec3 BarycentricCheck(Triangle triangle, glm::vec3 position);

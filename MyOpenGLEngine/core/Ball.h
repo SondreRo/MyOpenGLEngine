@@ -19,6 +19,9 @@ public:
 	std::vector<glm::vec3> LinePoints;
 	std::vector<Vertex> TracePoints;
 
+	glm::vec3 SpawnLocation;
+	bool FirstUpdate = true;
+
 	void Resetball();
 
 	int TestVariable;
