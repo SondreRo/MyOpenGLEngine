@@ -40,6 +40,8 @@ void Application::Run()
     LoadContent();
     float lastFrame = static_cast<float>(glfwGetTime());
 
+    float SpeedMultiply = 1;
+
     while (!mWindow.IsClosed())
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -51,7 +53,18 @@ void Application::Run()
             deltaTime = 0.2f;
         }
 
+      
+
+		deltaTime *= SpeedMultiply;
+
         mWindow.StartFrame();
+
+        ImGui::Begin("Speed");
+
+        ImGui::SliderFloat("Speed", &SpeedMultiply, 0.1f, 10.0f);
+
+        ImGui::End();
+
         mWindow.Update(deltaTime);
         mWindow.Render(deltaTime);
         mWindow.EndFrame();
