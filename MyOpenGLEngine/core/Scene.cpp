@@ -453,7 +453,7 @@ void Scene::LoadContent()
 
 	for (auto point : Points)
 	{
-		std::cout << point.x << " " << point.y << " " << point.z << std::endl;
+		//std::cout << point.x << " " << point.y << " " << point.z << std::endl;
 		PointMesh->vertices.emplace_back(point);
 	}
 
