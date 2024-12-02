@@ -116,15 +116,10 @@ void LandscapeGenerator::GetVerticesFromFile(std::ifstream& file, glm::vec3& min
 			std::cout << "-";
 		}
 
-		if (LineNumber % 2 == 0)
+	/*	if (LineNumber % 2 == 0)
 		{
 			continue;
-		}
-
-		//if (LineNumber >= 100000)
-		//{
-		//	break;
-		//}
+		}*/
 
 		glm::vec3 position = glm::vec3(0, 0, 0);
 		glm::vec3 color = glm::vec3(1.f);
@@ -464,20 +459,14 @@ void LandscapeGenerator::Thread_ChunkFill_worker()
 
 void LandscapeGenerator::FillChunksWithVertex(Chunk* inChunk)
 {
-	std::vector<Vertex> newVertices;
 	float Padding = TriangleSize * 1.5f;
-	//inChunk->vertices.reserve(vertices.size());
 	for (auto vertex : vertices)
 	{
-		//std::cout << "Vertex: " << vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << "\n";
 		if (vertex.position.x >= inChunk->MinX - Padding && vertex.position.x <= inChunk->MaxX + Padding &&
 			vertex.position.z >= inChunk->MinZ - Padding && vertex.position.z <= inChunk->MaxZ + Padding)
 		{
 			assert(inChunk != nullptr);
-
 			inChunk->vertices.emplace_back(vertex);
-			/*Vertex newVertex = vertex;
-			inChunk->vertices.emplace_back(newVertex);*/
 		}
 	}
 	
@@ -542,20 +531,14 @@ void LandscapeGenerator::TriangulateChunk(Chunk* inChunk)
 			glm::vec3 Color = glm::vec3(0, 0, 0);
 			unsigned int count = 0;
 
-			// Get the height of the terrain
 			for (const auto& vertex : inChunk->vertices)
 			{
-				/*if (vertex.position.x > CurX - MeshResolution && vertex.position.x < CurX + MeshResolution &&
-					vertex.position.z > CurZ - MeshResolution && vertex.position.z < CurZ + MeshResolution)*/
 				if (vertex.position.x > CurX - MeshResolution && vertex.position.x < CurX + MeshResolution &&
 					vertex.position.z > CurZ - MeshResolution && vertex.position.z < CurZ + MeshResolution)
 				{
 					Color += vertex.color;
 					Height += vertex.position.y;
 					count++;
-
-					//break;
-
 				}
 
 			}
@@ -578,20 +561,6 @@ void LandscapeGenerator::TriangulateChunk(Chunk* inChunk)
 			}
 			
 			inChunk->verticesTriangulated.emplace_back(glm::vec3(CurX, Height, CurZ), glm::vec3(0, 1, 0), glm::vec2(0), Color);
-			//if (LineCount == 1)
-			//{
-			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 1, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
-			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 2, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
-			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 3, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
-
-			//}
-			//if (LineCount == 2)
-			//{
-			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 1, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
-			//	triangulatedMesh->vertices.emplace_back(glm::vec3(x, Height + 2, z), glm::vec3(0, 1, 0), glm::vec2(0), glm::vec3(1, 0, 0));
-			//	
-
-			//}
 
 			CurZ += MeshResolution;
 		}

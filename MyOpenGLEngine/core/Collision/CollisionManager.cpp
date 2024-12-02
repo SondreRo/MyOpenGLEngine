@@ -292,17 +292,20 @@ void CollisionManager::PhysicsUpdate(float DeltaTime, LandscapeMesh* landscape, 
 		Timer += DeltaTime;
 
 	bool BTimer = false;
-	if (Timer > 1)
+	if (Timer > 2)
 	{
 		Timer = 0;
 		BTimer = true;
 	}
 	for (auto ball: balls)
 	{
+		ball->Timer += DeltaTime;
+
 		if (UpdateLines && !FreezeUpdates)
 		{
-			if (BTimer == true)
+			if (ball->Timer > 1)
 			{
+				ball->Timer = 0;
 				if (glm::length(ball->velocity) > 0.1f)
 				{
 					Vertex NewPoint = Vertex();
@@ -551,39 +554,49 @@ glm::vec3 CollisionManager::BarycentricCheck(Triangle triangle, glm::vec3 positi
 
 	//return { position.x, yCoord, position.z};
 
-	glm::vec3 p1 = triangle.vA.position;
-	glm::vec3 p2 = triangle.vB.position;
-	glm::vec3 p3 = triangle.vC.position;
-	glm::vec3 p4 = position;
+	//glm::vec3 p1 = triangle.vA.position;
+	//glm::vec3 p2 = triangle.vB.position;
+	//glm::vec3 p3 = triangle.vC.position;
+	//glm::vec3 p4 = position;
 
-	glm::vec3 p12 = p2 - p1;
-	glm::vec3 p13 = p3 - p1;
-	glm::vec3 cross = glm::cross(p13, p12);
-	float area_123 = cross.y; // double the area
-	glm::vec3 baryc; // for return
+	//glm::vec3 p12 = p2 - p1;
+	//glm::vec3 p13 = p3 - p1;
+	//glm::vec3 cross = glm::cross(p13, p12);
+	//float area_123 = cross.y; // double the area
+	//glm::vec3 baryc; // for return
 
-	// u
-	glm::vec3 p = p2 - p4;
-	glm::vec3 q = p3 - p4;
-	glm::vec3 nu = glm::cross(q, p);
-	// double the area of p4pq
-	baryc.x = nu.y / area_123;
+	//glm::vec3 p = p2 - p4;
+	//glm::vec3 q = p3 - p4;
+	//glm::vec3 nu = glm::cross(q, p);
 
-	// v
-	p = p3 - p4;
-	q = p1 - p4;
-	glm::vec3 nv = glm::cross(q, p);
-	// double the area of p4pq
-	baryc.y = nv.y / area_123;
-
-	// w
-	p = p1 - p4;
-	q = p2 - p4;
-	glm::vec3 nw = (glm::cross(q, p));
-	// double the area of p4pq
-	baryc.z = nw.y / area_123;
+	//baryc.x = nu.y / area_123;
 
 
-	glm::vec3 Adjusted = p1 * baryc.x + p2 * baryc.y + p3 * baryc.z;
-	return Adjusted;
+	//p = p3 - p4;
+	//q = p1 - p4;
+	//glm::vec3 nv = glm::cross(q, p);
+
+	//baryc.y = nv.y / area_123;
+
+
+	//p = p1 - p4;
+	//q = p2 - p4;
+	//glm::vec3 nw = (glm::cross(q, p));
+	//
+	//baryc.z = nw.y / area_123;
+
+
+	//glm::vec3 Adjusted = p1 * baryc.x + p2 * baryc.y + p3 * baryc.z;
+	//return Adjusted;
+
+	glm::vec3 p1 = triangle.vA.position, p2 = triangle.vB.position, p3 = triangle.vC.position, p4 = position;
+	glm::vec3 cross = glm::cross(p3 - p1, p2 - p1);
+	float area = cross.y;
+	glm::vec3 baryc;
+
+	baryc.x = glm::cross(p3 - p4, p2 - p4).y / area;
+	baryc.y = glm::cross(p1 - p4, p3 - p4).y / area;
+	baryc.z = glm::cross(p2 - p4, p1 - p4).y / area;
+
+	return p1 * baryc.x + p2 * baryc.y + p3 * baryc.z;
 }

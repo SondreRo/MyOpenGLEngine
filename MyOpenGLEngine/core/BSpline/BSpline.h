@@ -12,7 +12,8 @@ public:
         if (degree == 0) {
             return (knots[i] <= t && t < knots[i + 1]) ? 1.0f : 0.0f;
         }
-        else {
+        else
+        {
             float a = 0.0f;
             if (i + degree < knots.size() && knots[i + degree] != knots[i]) {
                 a = (t - knots[i]) / (knots[i + degree] - knots[i]);

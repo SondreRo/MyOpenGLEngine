@@ -427,7 +427,7 @@ void Scene::LoadContent()
 	//std::vector<float> knots = { 0.0f, 0.0f, 0.0f, 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f };
 	std::vector<float> knots = {};
 
-	std::vector<glm::vec3> control_points = {
+	/*std::vector<glm::vec3> control_points = {
 	glm::vec3(0.0f, 0.0f, 0.0f),
 	glm::vec3(1.0f, 5.0f, 0.0f),
 	glm::vec3(2.0f, 4.0f, 5.0f),
@@ -436,6 +436,14 @@ void Scene::LoadContent()
 	glm::vec3(5.0f, -1.0f, 0.0f),
 	glm::vec3(6.0f, 0.0f, 0.0f),
 	glm::vec3(10.0f, 5.0f, -5.0f)
+	};*/
+	std::vector<glm::vec3> control_points = {
+	glm::vec3(0.f, 50.f, 0.f),
+	glm::vec3(10.f, 60.f, 0.f),
+	glm::vec3(20.f, 40.f, 0.f),
+	glm::vec3(25.f, 70.f, 0.f),
+	glm::vec3(30.f, 50.f, 0.f),
+	glm::vec3(50.f, 55.f, 0.f)
 	};
 
 	std::vector<glm::vec3> Points = BSpline::GeneratePoints(control_points, knots, 1000);

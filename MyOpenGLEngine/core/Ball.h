@@ -19,6 +19,8 @@ public:
 	std::vector<glm::vec3> LinePoints;
 	std::vector<Vertex> TracePoints;
 
+	float Timer = 0;
+
 	glm::vec3 SpawnLocation;
 	bool FirstUpdate = true;
 

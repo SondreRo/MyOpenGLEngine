@@ -46,6 +46,7 @@ private:
 	static std::queue<Chunk> chunkQueueOutput;
 
 	float ChunkSize = 20;
+	//float TriangleSize = 0.5f;
 	float TriangleSize = 5.0f;
 
 
