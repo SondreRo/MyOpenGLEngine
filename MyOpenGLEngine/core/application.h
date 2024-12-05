@@ -17,6 +17,7 @@ public:
     void Run();
 
     Scene mScene{ "Scene" };
+	float deltaTime = 0.0f;
 
 private:
     inline static Application* instance = nullptr;

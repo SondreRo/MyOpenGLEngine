@@ -45,7 +45,7 @@ void Application::Run()
     while (!mWindow.IsClosed())
     {
         float currentFrame = static_cast<float>(glfwGetTime());
-        float deltaTime = currentFrame - lastFrame;
+        deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         if (deltaTime > 0.2f)

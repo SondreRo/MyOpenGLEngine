@@ -25,6 +25,7 @@ public:
 
 	static void GenerateSphere(Mesh* inMesh, float Radius, int Sectors, int Stacks);
 	static void GenerateIcosahedron(Mesh* inMesh, int n);
+	static void GenerateIcosahedron(MeshBase* inMesh, int n);
 
 	static void GeneratePoolTable(Mesh* floorMesh, Mesh* topWall, Mesh* bottomWall, Mesh* rightWall, Mesh* leftWall, glm::vec3 size);
 

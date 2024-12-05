@@ -23,7 +23,9 @@
 ECSManager::ECSManager()
 {
 	BoxMesh = new MeshBase();
-	MeshGenerator::GenerateCubeWithHardEdges(BoxMesh, glm::vec3(1.f));
+	//MeshGenerator::GenerateSphere(BoxMesh, 1, 10, 10);
+	MeshGenerator::GenerateIcosahedron(BoxMesh, 3);
+	//MeshGenerator::GenerateCubeWithHardEdges(BoxMesh, glm::vec3(1.f));
 	
 }
 
@@ -50,7 +52,7 @@ void ECSManager::Setup()
 
 
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		// Random float between -50 and 50
 		float RandX = rand() % 100 - 50;
@@ -145,7 +147,7 @@ void ECSManager::CreateEnemy(glm::vec3 Position)
 
 	E1->AddComponent<VelocityComponent>(new VelocityComponent(glm::vec3(RandVelX, 0, RandVelZ)));
 	E1->AddComponent<MeshComponent>(new MeshComponent(BoxMesh));
-	E1->AddComponent<SphereColliderComponent>(new SphereColliderComponent(0.5f));
+	E1->AddComponent<SphereColliderComponent>(new SphereColliderComponent(1.0f));
 	//E1->AddComponent<CombatComponent>(new CombatComponent(100, 10, Entities[0]));
 
 }

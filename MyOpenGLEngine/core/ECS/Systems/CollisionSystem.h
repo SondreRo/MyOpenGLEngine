@@ -76,15 +76,31 @@ public:
 									{
 										// Check if the other entity is moving away from us
 										//if (glm::dot(VC->Velocity, otherVC->Velocity) > 0) continue;
+										glm::vec3 CollisionNormal = glm::normalize(TC->transform.GetLocation() - otherTC->transform.GetLocation());
 
+										glm::vec3 relativeVelocity = VC->Velocity - otherVC->Velocity;
+										float velocityAlongNormal = glm::dot(relativeVelocity, CollisionNormal);
+										if (velocityAlongNormal > 0)
+										{
+											continue;
+										}
+										float e = 1.f;
+										float j = -(1 + e) * velocityAlongNormal;
+										j /= 1 + 1;
+										glm::vec3 impulse = j * CollisionNormal;
+										if (impulse.length() > 0.001f && impulse.length() < 1000.f)
+										{
+											VC->Velocity += impulse;
+											otherVC->Velocity -= impulse;
+										}
 
-										glm::vec3 Direction = glm::normalize(TC->transform.GetLocation() - otherTC->transform.GetLocation());
+										/*glm::vec3 Direction = glm::normalize(TC->transform.GetLocation() - otherTC->transform.GetLocation());
 										TC->transform.SetLocation(TC->transform.GetLocation() + Direction * (CombinedRadius - Distance));
 										VC->Velocity = glm::reflect(VC->Velocity, Direction);
 
 										Direction = -Direction;
 										otherTC->transform.SetLocation(otherTC->transform.GetLocation() + Direction * (CombinedRadius - Distance));
-										otherVC->Velocity = glm::reflect(otherVC->Velocity, Direction);
+										otherVC->Velocity = glm::reflect(otherVC->Velocity, Direction);*/
 									}
 								}
 							}

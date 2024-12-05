@@ -15,6 +15,8 @@ include_directories(includes)
 include_directories(libs)
 include_directories(core)
 include_directories(includes/imgui)
+include_directories(lua54/include)
+
 
 #Add IMGUI headers
 set( IMGUI_HEADERS
@@ -39,11 +41,11 @@ set( IMGUI_SOURCE
 
 # HeaderFiles
 set (HEADER_FILES
- "core/Application.h" "core/Test.h" "core/Framebuffer.h" "core/ShaderProgram.h" "core/Mesh.h" "core/Vertex.h" "core/Camera.h" "core/Transform.h" "core/Window.h" "core/Scene.h" "core/MeshGenerator.h" "core/LineMesh.h" "core/Material.h" "core/Ball.h" "core/Collision/Colliders.h" "core/Collision/OcTree.h" "core/Collision/CollisionManager.h" "core/Timer.h" "core/Collision/OcTreeNode.h" "core/Actor.h" "ActorComponent.h"  "core/ECS/Entity.h" "core/ECS/Components/TransformComponent.h" "core/ECS/Components/VelocityComponent.h" "core/ECS/Systems/SystemBase.h" "core/ECS/Systems/MovementSystem.h" "core/ECS/Components/MeshComponent.h" "core/MeshBase.h" "core/ECS/Systems/RenderSystem.h" "core/ECS/Systems/AICombatSystem.h" "core/ECS/Components/CombatComponent.h" "core/ECS/Components/InputComponent.h"  "core/PunktSky/PunktSky.h" "core/BSpline/BSplineSurface.h" "core/Landscape/LandscapeGenerator.h" "core/Landscape/Chunk.h" "core/Landscape/LandscapeMesh.h" "core/Triangle.h" "core/BSpline/BSpline.h" "core/ParticleSystem/ParticleSystem.h" "core/ECS/Components/SphereColliderComponent.h" "core/ECS/Systems/CollisionSystem.h")
+ "core/Application.h" "core/Test.h" "core/Framebuffer.h" "core/ShaderProgram.h" "core/Mesh.h" "core/Vertex.h" "core/Camera.h" "core/Transform.h" "core/Window.h" "core/Scene.h" "core/MeshGenerator.h" "core/LineMesh.h" "core/Material.h" "core/Ball.h" "core/Collision/Colliders.h" "core/Collision/OcTree.h" "core/Collision/CollisionManager.h" "core/Timer.h" "core/Collision/OcTreeNode.h" "core/Actor.h" "ActorComponent.h"  "core/ECS/Entity.h" "core/ECS/Components/TransformComponent.h" "core/ECS/Components/VelocityComponent.h" "core/ECS/Systems/SystemBase.h" "core/ECS/Systems/MovementSystem.h" "core/ECS/Components/MeshComponent.h" "core/MeshBase.h" "core/ECS/Systems/RenderSystem.h" "core/ECS/Systems/AICombatSystem.h" "core/ECS/Components/CombatComponent.h" "core/ECS/Components/InputComponent.h"  "core/PunktSky/PunktSky.h" "core/BSpline/BSplineSurface.h" "core/Landscape/LandscapeGenerator.h" "core/Landscape/Chunk.h" "core/Landscape/LandscapeMesh.h" "core/Triangle.h" "core/BSpline/BSpline.h" "core/ParticleSystem/ParticleSystem.h" "core/ECS/Components/SphereColliderComponent.h" "core/ECS/Systems/CollisionSystem.h" "core/Lua/Lua.h")
  
  # SourceFiles
 set (SRC_FILES
-includes/glad.c "core/application.cpp"   "core/Test.cpp" "core/Framebuffer.cpp" "core/ShaderProgram.cpp" "core/Mesh.cpp" "core/Camera.cpp" "core/Transform.cpp" "core/Window.cpp" "core/Scene.cpp" "core/MeshGenerator.cpp" "core/LineMesh.cpp" "core/Material.cpp" "core/Ball.cpp" "core/Collision/OcTree.cpp" "core/Collision/CollisionManager.cpp" "core/Collision/Colliders.cpp"  "core/ECS/ECSManager.cpp" "core/ECS/Entity.cpp" "core/PunktSky/PunktSky.cpp" "core/BSpline/BSplineSurface.cpp" "core/Landscape/LandscapeGenerator.cpp" "core/Landscape/LandscapeMesh.cpp" "core/BSpline/BSpline.cpp" "core/ParticleSystem/ParticleSystem.cpp")
+includes/glad.c "core/application.cpp"   "core/Test.cpp" "core/Framebuffer.cpp" "core/ShaderProgram.cpp" "core/Mesh.cpp" "core/Camera.cpp" "core/Transform.cpp" "core/Window.cpp" "core/Scene.cpp" "core/MeshGenerator.cpp" "core/LineMesh.cpp" "core/Material.cpp" "core/Ball.cpp" "core/Collision/OcTree.cpp" "core/Collision/CollisionManager.cpp" "core/Collision/Colliders.cpp"  "core/ECS/ECSManager.cpp" "core/ECS/Entity.cpp" "core/PunktSky/PunktSky.cpp" "core/BSpline/BSplineSurface.cpp" "core/Landscape/LandscapeGenerator.cpp" "core/Landscape/LandscapeMesh.cpp" "core/BSpline/BSpline.cpp" "core/ParticleSystem/ParticleSystem.cpp" "core/Lua/Lua.cpp")
 
 
 
@@ -54,12 +56,19 @@ includes/glad.c "core/application.cpp"   "core/Test.cpp" "core/Framebuffer.cpp" 
 
 add_subdirectory(libs/glfw-3.3.9)
 
+
 # Add source to this project's executable.
 add_executable (MyOpenGLEngine ${IMGUI_HEADERS} ${IMGUI_SOURCE} ${HEADER_FILES} ${SRC_FILES} "MyOpenGLEngine.cpp" "MyOpenGLEngine.h")
 
 target_link_libraries(MyOpenGLEngine glfw)
 
+# link_directories(libs)
+# target_link_libraries(MyOpenGLEngine lua54)
 
+include_directories(${CMAKE_SOURCE_DIR}/libs/Lua/include)
+target_link_libraries(MyOpenGLEngine ${CMAKE_SOURCE_DIR}/libs/Lua/lua54.lib)
+
+#target_link_libraries(MyOpenGLEngine D:/OpenGL/MyEngine/MyOpenGLEngine/lua54/lua54.lib)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET MyOpenGLEngine PROPERTY CXX_STANDARD 20)

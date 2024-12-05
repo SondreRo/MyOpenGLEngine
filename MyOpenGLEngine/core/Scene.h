@@ -14,6 +14,7 @@
 #include "ECS/ECSManager.h"
 #include "ParticleSystem/ParticleSystem.h"
 
+#include "Lua/Lua.h"
 
 class Window;
 
@@ -56,6 +57,8 @@ public:
 	LineMesh* lineMesh;
 
 	ParticleSystem* particleSystem;
+
+	Lua* lua;
 
 	Mesh* RootMesh;
 	Mesh* SunMesh;

@@ -349,6 +349,15 @@ void MeshGenerator::GenerateIcosahedron(Mesh* inMesh, int n)
 	std::cout << "Time to generate sphere: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
 }
 
+void MeshGenerator::GenerateIcosahedron(MeshBase* inMesh, int n)
+{
+	Mesh* mesh = new Mesh();
+	GenerateIcosahedron(mesh, n);
+	inMesh->vertices = mesh->vertices;
+	inMesh->indices = mesh->indices;
+	inMesh->MeshCorners = mesh->MeshCorners;
+}
+
 void MeshGenerator::GeneratePoolTable(Mesh* floorMesh, Mesh* topWall, Mesh* bottomWall, Mesh* rightWall, Mesh* leftWall,
                                       glm::vec3 size)
 {
