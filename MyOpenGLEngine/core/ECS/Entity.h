@@ -31,6 +31,8 @@ public:
 	}
 
 	std::unordered_map<std::string, ComponentBase*> components;
+
+
 };
 
 template <typename T>
@@ -42,5 +44,6 @@ void Entity::AddComponent(T* component)
 		return;
 	}
 	std::string name = typeid(*component).name();
+
 	components[name] = component;
 }

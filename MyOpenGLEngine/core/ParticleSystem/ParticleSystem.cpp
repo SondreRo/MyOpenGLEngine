@@ -75,9 +75,14 @@ void ParticleSystem::Draw()
 
 	for (unsigned int i = 0; i < ParticleCount; i++)
 	{
-		ParticleMesh->transform.SetLocation(particles.position[i]);
+		//ParticleMesh->transform.SetLocation(particles.position[i]);
 		//Application::get().mScene.ReadyRenderData(ParticleMesh->shaderProgram, ParticleMesh, ParticleMesh->ParentMatrix, Application::get().mScene.width, Application::get().mScene.height);
-			// Mesh location
+		// Mesh location
+
+		ParticleMesh->transform.SetLocation(particles.position[i]);
+		//ParticleMesh->transform.SetRotation(particles.velocity[i]);
+		//ParticleMesh->transform.SetScale(particles.velocity[i]);
+
 		glUniformMatrix4fv(glGetUniformLocation(ParticleMesh->shaderProgram->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(ParticleMesh->transform.GetMatrix()));
 		//Mesh Color
 		glUniform3fv(glGetUniformLocation(ParticleMesh->shaderProgram->shaderProgram, "diffuse"), 1, glm::value_ptr(ParticleMesh->material.diffuse));

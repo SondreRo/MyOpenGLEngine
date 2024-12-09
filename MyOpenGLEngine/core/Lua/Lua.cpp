@@ -14,6 +14,7 @@ int cAdd(lua_State* L)
 
     // Step 3:  Push the result on the lua stack. 
     lua_pushnumber(L, sum);
+    
 
     // Return the number of arguments we pushed onto the stack (that is, the number of return values this
     // function has
@@ -59,6 +60,11 @@ int SetPosition(lua_State* L)
     int n = lua_gettop(L);
 
     std::string name = lua_tostring(L, 1);
+   // lua_to
+    int* test = new int;
+    auto test2 = lua_tonumberx(L, 5, test);
+
+    std::cout << test2 << std::endl;
 
 	float x = lua_tonumber(L, 2);
 	float y = lua_tonumber(L, 3);
@@ -150,6 +156,6 @@ void Lua::DoFile(const std::filesystem::path inPath)
 {
 	std::string test = inPath.string();
 	luaL_dofile(L, test.c_str());
-    
+  
 }
 

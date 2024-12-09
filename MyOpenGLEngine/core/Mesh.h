@@ -75,10 +75,10 @@ public:
 	std::vector<Mesh*> Children;
 	void AddChild(Mesh* mesh);
 	Mesh* Parent = nullptr;
+	unsigned int VAO, VBO, EBO;
 
 private:
 
 protected:
-	unsigned int VAO, VBO, EBO;
 
 };

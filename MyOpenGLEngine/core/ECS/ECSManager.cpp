@@ -7,12 +7,14 @@
 #include "Components/CombatComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SphereColliderComponent.h"
+#include "Components/ColorComponent.h"
 
 // Systems
 #include "Systems/MovementSystem.h"
 #include "Systems/RenderSystem.h"
 #include "Systems/AICombatSystem.h"
 #include "Systems/CollisionSystem.h"
+#include "Systems/ColorSystem.h"
 
 // Extra
 #include "Application.h"
@@ -26,12 +28,18 @@ ECSManager::ECSManager()
 	//MeshGenerator::GenerateSphere(BoxMesh, 1, 10, 10);
 	MeshGenerator::GenerateIcosahedron(BoxMesh, 3);
 	//MeshGenerator::GenerateCubeWithHardEdges(BoxMesh, glm::vec3(1.f));
-	
+
+
+
 }
 
 
 void ECSManager::Setup()
 {
+
+	
+	dod_components_map["ColorComponent"] = new DODColorComponentInternal();
+
 	ShaderProgram* newShader = Application::get().mScene.Shaders["DefaultShader"];
 	BoxMesh->shaderProgram = newShader;
 	BoxMesh->material.diffuse = glm::vec3(1, 0, 0);
@@ -73,6 +81,9 @@ void ECSManager::SystemSetup()
 	Systems.emplace_back(new RenderSystem());
 	Systems.emplace_back(new AICombatSystem());
 	Systems.emplace_back(new CollisionSystem());
+	
+	//Systems.emplace_back(new ColorSystem(static_cast<DODColorComponentInternal*>(dod_components_map["ColorComponent"])));
+	Systems.emplace_back(new ColorSystem((DODColorComponentInternal*)(dod_components_map["ColorComponent"])));
 
 
 	for (auto& system : Systems)
@@ -148,6 +159,10 @@ void ECSManager::CreateEnemy(glm::vec3 Position)
 	E1->AddComponent<VelocityComponent>(new VelocityComponent(glm::vec3(RandVelX, 0, RandVelZ)));
 	E1->AddComponent<MeshComponent>(new MeshComponent(BoxMesh));
 	E1->AddComponent<SphereColliderComponent>(new SphereColliderComponent(1.0f));
+
+	E1->AddComponent<ColorComponent>(new ColorComponent((DODColorComponentInternal*)(dod_components_map["ColorComponent"]), glm::vec3(0, 1, 0)));
+
+
 	//E1->AddComponent<CombatComponent>(new CombatComponent(100, 10, Entities[0]));
 
 }

@@ -62,10 +62,11 @@ public:
 	{
 		CollisionData data;
 		float distance = glm::distance(Sphere1.center, Sphere2.center);
+		data.collisionNormal = glm::normalize(Sphere1.center - Sphere2.center);
+
 		if (distance < Sphere1.radius + Sphere2.radius)
 		{
 			data.isColliding = true;
-			data.collisionNormal = glm::normalize(Sphere1.center - Sphere2.center);
 			data.penetration = Sphere1.radius + Sphere2.radius - distance;
 			return data;
 		}

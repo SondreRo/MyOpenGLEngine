@@ -21,18 +21,35 @@
 --    print("Lua " .. number)
 -- end
 
---SetPosition("FloorMesh", 0, 0, 0)
-AddPosition("FloorMesh", -0 * GetDeltaTime(), 0 * GetDeltaTime(), 0)
---SetPosition("FloorMesh", 0,0,0)
+-- mynumber, number2 = cAdd(1,10)
 
---number = 0
-number = number + GetDeltaTime()
+-- --SetPosition("FloorMesh", 0, 0, 0)
+-- AddPosition("BoxMesh", -0 * GetDeltaTime(), 0 * GetDeltaTime(), 0)
+
+-- myvec = {1,5,2}
+-- SetPosition("FloorMesh", 0,0,0, myvec)
 
 
-print(number)
+val1 = cAdd(10,50, 25)
+	
+AddPosition("BoxMesh",0 * GetDeltaTime(), 0, 0)
+-- --number = 0
+-- number = number + GetDeltaTime()
 
--- if number > 1 then
---    number = 0
---    print("SpawnEnemy")
---    CreateEnemy(0,1,0)
--- end
+
+-- --print(number)
+
+if number == nil then
+	number = 0
+else
+    number = number + GetDeltaTime() 
+end
+
+
+
+
+if number > 1 then
+    number = 0
+    print("SpawnEnemy")
+    CreateEnemy(0,1,0)
+end

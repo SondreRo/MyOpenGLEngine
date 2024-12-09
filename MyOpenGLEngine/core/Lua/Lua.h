@@ -3,14 +3,14 @@
 
 #include <filesystem>
 
-extern "C"
-{
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-}
+//extern "C"
+//{
+//#include "lua.h"
+//#include "lauxlib.h"
+//#include "lualib.h"
+//}
 
-//#include "lua.hpp"
+#include "lua.hpp"
 
 class Lua {
 public:

@@ -8,6 +8,7 @@
 // Extra
 #include "MeshBase.h"
 #include "Window.h"
+#include "Components/ColorComponent.h"
 
 class ECSManager {
 
@@ -37,6 +38,11 @@ public:
 	std::vector<Entity*> Entities;
 
 	std::vector<Entity*> EntitiesToDelete;
+
+	//std::unordered_map<std::string, DODComponentBaseInternal> DodComponent;
+
+	std::unordered_map<std::string, DODComponentBaseInternal*> dod_components_map;
+	//DODColorComponentInternal* dodColorComponentInternal;
 
 private:
 	Entity* CreateEntity();

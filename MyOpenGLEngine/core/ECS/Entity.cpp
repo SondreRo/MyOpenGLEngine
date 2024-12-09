@@ -12,6 +12,8 @@ Entity::~Entity()
 	}
 }
 
+
+
 void Entity::RemoveComponent(ComponentBase* component)
 {
 	if (!CheckIfComponentExists(component))

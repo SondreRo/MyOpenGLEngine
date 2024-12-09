@@ -5,6 +5,7 @@
 //#include "test.h"
 #include "Application.h"
 //#include "test.h"
+#include "tempTest.h"
 
 void IncrementInt(int& i)
 {
@@ -19,6 +20,11 @@ int main()
 
 	//Test t;
 	//t.MyTest();
+	//glm::vec3 Velocity = tempTest::GetNormalAfterCollision({ 2,1,0 }, { -0.8, -0.6, 0 });
+	//tempTest::GetNormalballToball();
+	//std::cout << Velocity.x << " " << Velocity.y << " " << Velocity.z;
+
+	//return 0;
 
 	Application::get().Run();
 

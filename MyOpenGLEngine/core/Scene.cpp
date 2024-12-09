@@ -38,7 +38,6 @@ void Scene::LoadContent()
 
 
 	ShaderProgram* shaderProgram = new ShaderProgram();
-	
 	if (shaderProgram->ReadShaderFile("../../../core/shaders/VertexShader.vert", "../../../core/shaders/FragmentShader.frag") == 0)
 	{
 		shaderProgram->ReadShaderFile("shaders/VertexShader.vert", "shaders/FragmentShader.frag");
@@ -48,9 +47,8 @@ void Scene::LoadContent()
 	if (lineShaderProgram->ReadShaderFile("../../../core/shaders/lineShaders/LineVertexShader.vert", "../../../core/shaders/lineShaders/LineFragmentShader.frag") == 0)
 	{
 		lineShaderProgram->ReadShaderFile("shaders/lineShaders/LineVertexShader.vert", "shaders/lineShaders/LineFragmentShader.frag");
-	
-
 	}
+
 
 	//shaderProgram->ReadShaderFile("D:/OpenGL/MyEngine/MyOpenGLEngine/core/shaders/VertexShader.vert", "D:/OpenGL/MyEngine/MyOpenGLEngine/core/shaders/FragmentShader.frag");
 	shaderProgram->CompileShaders();
@@ -59,8 +57,10 @@ void Scene::LoadContent()
 	lineShaderProgram->CompileShaders();
 	lineShaderProgram->CreateProgram();
 
+
 	Shaders["DefaultShader"] = shaderProgram;
 	Shaders["LineShader"] = lineShaderProgram;
+
 
 	RootMesh = new Mesh("RootMesh");
 	RootMesh->shaderProgram = shaderProgram;
