@@ -32,7 +32,7 @@
 
 val1 = cAdd(10,50, 25)
 	
-AddPosition("BoxMesh",0 * GetDeltaTime(), 0, 0)
+--AddPosition("FloorMesh",-5 * GetDeltaTime(), 0, 0)
 -- --number = 0
 -- number = number + GetDeltaTime()
 
@@ -48,7 +48,7 @@ end
 
 
 
-if number > 1 then
+if number > 3 then
     number = 0
     print("SpawnEnemy")
     CreateEnemy(0,1,0)

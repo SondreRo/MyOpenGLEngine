@@ -104,16 +104,13 @@ int AddPosition(lua_State* L)
 
 int CreateEnemy(lua_State* L)
 {
-    // Get the number of parameters
-    int n = lua_gettop(L);
-
     float x = lua_tonumber(L, 1);
     float y = lua_tonumber(L, 2);
     float z = lua_tonumber(L, 3);
 
 	Application::get().mScene.ecs_manager.CreateEnemy({ x, y, z });
 
-    return 1;
+    return 0;
 }
 
 void Lua::Init()

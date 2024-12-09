@@ -4,7 +4,7 @@
 #include "Application.h"
 #include "glm/gtc/type_ptr.hpp"
 
-void ParticleSystem::AddParticle(glm::vec3 position, glm::vec3 velocity)
+void ParticleSystem::AddParticle(glm::vec3 position, glm::vec3 velocity, glm::vec3 color)
 {
 	if (ParticleCount >= MaxParticles) return;
 
@@ -12,6 +12,7 @@ void ParticleSystem::AddParticle(glm::vec3 position, glm::vec3 velocity)
 	ParticleCount++;
 	particles.position.emplace_back(position);
 	particles.velocity.emplace_back(velocity);
+	particles.color.emplace_back(color);
 }
 
 void ParticleSystem::RemoveParticle(unsigned int index)
@@ -19,6 +20,7 @@ void ParticleSystem::RemoveParticle(unsigned int index)
 	ParticleCount--;
 	particles.position.erase(particles.position.begin() + index);
 	particles.velocity.erase(particles.velocity.begin() + index);
+	particles.color.erase(particles.color.begin() + index);
 }
 
 void ParticleSystem::ReserveParticles(unsigned int count)
@@ -26,6 +28,7 @@ void ParticleSystem::ReserveParticles(unsigned int count)
 	ParticleCount = count;
 	particles.position.reserve(count);
 	particles.velocity.reserve(count);
+	particles.color.reserve(count);
 }
 
 void ParticleSystem::ClearParticles()
@@ -33,6 +36,7 @@ void ParticleSystem::ClearParticles()
 	ParticleCount = 0;
 	particles.position.clear();
 	particles.velocity.clear();
+	particles.color.clear();
 }
 
 void ParticleSystem::Update(float deltaTime)
@@ -85,7 +89,7 @@ void ParticleSystem::Draw()
 
 		glUniformMatrix4fv(glGetUniformLocation(ParticleMesh->shaderProgram->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(ParticleMesh->transform.GetMatrix()));
 		//Mesh Color
-		glUniform3fv(glGetUniformLocation(ParticleMesh->shaderProgram->shaderProgram, "diffuse"), 1, glm::value_ptr(ParticleMesh->material.diffuse));
+		glUniform3fv(glGetUniformLocation(ParticleMesh->shaderProgram->shaderProgram, "diffuse"), 1, glm::value_ptr(particles.color[i]));
 
 
 		ParticleMesh->Draw();
@@ -120,7 +124,7 @@ void ParticleSystem::SpawnSnowParticle()
 	);
 
 
-	AddParticle(RandomPosition, RandomVelocity);
+	AddParticle(RandomPosition, RandomVelocity, {1,1,1});
 }
 
 float ParticleSystem::RandomFloat(float min, float max)

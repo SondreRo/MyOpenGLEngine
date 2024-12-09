@@ -8,6 +8,7 @@ struct ParticleInfo
 {
 	std::vector<glm::vec3> position;
 	std::vector<glm::vec3> velocity;
+	std::vector<glm::vec3> color;
 };
 
 class ParticleSystem {
@@ -25,7 +26,7 @@ public:
 	glm::vec3 SpawnMax = glm::vec3(10, 25, 10);
 	int spawnRate = 10;
 
-	void AddParticle(glm::vec3 position, glm::vec3 velocity);
+	void AddParticle(glm::vec3 position, glm::vec3 velocity, glm::vec3 color);
 	void RemoveParticle(unsigned int index);
 	void ReserveParticles(unsigned int count);
 	void ClearParticles();

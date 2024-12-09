@@ -50,11 +50,6 @@ void CollisionManager::BruteForceCollisionChecks()
 					CollisionData data = SphereCollider::CheckCollision(ball1->GetSphereCollider(), ball2->GetSphereCollider());
 					if (data.isColliding)
 					{
-						//Application::get().mScene.lineMesh->AddLine(ball1->GetSphereCollider().center, ball2->GetSphereCollider().center);
-						//std::cout << "Ball Collision between " << meshes[i]->name << " and " << meshes[j]->name << std::endl;
-						//ball1->transform.AddLocation(glm::normalize(data.collisionNormal) * (data.penetration/2) + 0.01f);
-						//ball2->transform.AddLocation(-glm::normalize(data.collisionNormal) * (data.penetration / 2) + 0.01f);
-
 						// Collision response
 
 						glm::vec3 relativeVelocity = ball1->velocity - ball2->velocity;
