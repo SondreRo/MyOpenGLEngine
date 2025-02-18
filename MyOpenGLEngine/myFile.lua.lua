@@ -43,6 +43,7 @@ if number == nil then
 	number = 0
 else
     number = number + GetDeltaTime() 
+    ---number = GetDeltaTime();
 end
 
 

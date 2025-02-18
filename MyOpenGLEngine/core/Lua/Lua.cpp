@@ -102,6 +102,8 @@ int AddPosition(lua_State* L)
     return 0;
 }
 
+void CreateEnemy2(float x, float y, float z);
+
 int CreateEnemy(lua_State* L)
 {
     float x = lua_tonumber(L, 1);
